@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
 import DailyBarExpenseTracker from '../components/DailyBarExpenseTracker';
-import {
-  Coffee, Plus, CheckCircle, CreditCard, DollarSign, QrCode, Tag,
+import { 
+  Coffee, Plus, CheckCircle, CreditCard, DollarSign, QrCode, Tag, 
   AlertCircle, X, ShieldAlert, Receipt, Utensils, PackageCheck, AlertOctagon, CheckCircle2, MapPin
 } from 'lucide-react';
 
 const CAFETERIA_TABLES = [
-  'Table 1', 'Table 2', 'Table 3', 'Table 4',
-  'Table 5', 'Table 6', 'Patio Table A', 'Patio Table B',
+  'Table 1', 'Table 2', 'Table 3', 'Table 4', 
+  'Table 5', 'Table 6', 'Patio Table A', 'Patio Table B', 
   'Bar Counter'
 ];
 
@@ -18,16 +18,6 @@ export default function BarPOSPage({ user }) {
   const [openTabs, setOpenTabs] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Add Bar Item Modal State
-  const [showAddBarModal, setShowAddBarModal] = useState(false);
-  const [newBarItem, setNewBarItem] = useState({
-    name: '',
-    category: 'BEVERAGE',
-    price: '',
-    isAvailable: true
-  });
-  const [barModalError, setBarModalError] = useState('');
 
   // New Tab Order Cart State
   const [selectedTab, setSelectedTab] = useState(null);
@@ -55,19 +45,7 @@ export default function BarPOSPage({ user }) {
       ]);
       setMenuItems(menuRes.data);
       setOpenTabs(tabsRes.data);
-      const allMembers = membersRes.data || [];
-      setMembers(allMembers);
-
-      if (user) {
-        const matched = allMembers.find(m =>
-          (user.email && m.email?.toLowerCase() === user.email?.toLowerCase()) ||
-          (user.name && m.name?.toLowerCase() === user.name?.toLowerCase()) ||
-          (user.id && m.id === user.id)
-        );
-        if (matched) {
-          setSelectedMemberId(matched.id);
-        }
-      }
+      setMembers(membersRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -75,45 +53,11 @@ export default function BarPOSPage({ user }) {
     }
   };
 
-  const handleCreateBarItem = async (e) => {
-    e.preventDefault();
-    setBarModalError('');
-    if (!newBarItem.name || !newBarItem.price) {
-      setBarModalError('Item Name and Price are required.');
-      return;
-    }
-
-    try {
-      await api.post('/bar/menu', {
-        name: newBarItem.name,
-        category: newBarItem.category,
-        price: parseFloat(newBarItem.price),
-        isAvailable: newBarItem.isAvailable
-      });
-      setShowAddBarModal(false);
-      setNewBarItem({ name: '', category: 'BEVERAGE', price: '', isAvailable: true });
-      fetchBarData();
-    } catch (err) {
-      setBarModalError(err.response?.data?.error || 'Failed to add bar item.');
-    }
-  };
-
-  const handleDeleteBarItem = async (e, itemId, itemName) => {
-    e.stopPropagation();
-    if (!window.confirm(`Delete "${itemName}" from bar menu?`)) return;
-    try {
-      await api.delete(`/bar/menu/${itemId}`);
-      fetchBarData();
-    } catch (err) {
-      alert(err.response?.data?.error || 'Failed to delete bar item.');
-    }
-  };
-
   // Helper to check if a table is currently occupied by an open tab
   const getOccupyingTab = (tableName) => {
     if (!tableName) return null;
-    return openTabs.find(t =>
-      t.tableNumber &&
+    return openTabs.find(t => 
+      t.tableNumber && 
       t.tableNumber.toLowerCase().trim() === tableName.toLowerCase().trim() &&
       (!selectedTab || t.id !== selectedTab.id)
     );
@@ -171,54 +115,46 @@ export default function BarPOSPage({ user }) {
     }
   };
 
-  const loggedInMember = members.find(m =>
-    (user?.email && m.email?.toLowerCase() === user.email?.toLowerCase()) ||
-    (user?.name && m.name?.toLowerCase() === user.name?.toLowerCase()) ||
-    (user?.id && m.id === user.id)
-  );
-
-  const isMemberRole = user?.role === 'MEMBER' || (loggedInMember && !['OWNER', 'FRONT_DESK_STAFF', 'FRONT_DESK', 'BAR_SHOP_STAFF', 'SHOP_STAFF', 'BAR_STAFF', 'SHOP', 'BAR'].includes(user?.role));
-
-  const selectedMember = members.find(m => m.id === selectedMemberId) || loggedInMember;
+  const selectedMember = members.find(m => m.id === selectedMemberId);
   const memberDiscountPercent = selectedMember && selectedMember.tier ? selectedMember.tier.barDiscountPercent : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-
+    <div className="max-w-7xl mx-auto px-4 py-8 text-white">
+      
       {/* Header & Sub-Nav Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Coffee className="w-7 h-7 text-amber-500" /> Bar & Cafeteria Staff Portal
+          <h1 className="text-3xl font-black text-white flex items-center gap-3 tracking-tight">
+            <Coffee className="w-8 h-8 text-lime-400" /> Bar & Cafeteria Staff Portal
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-zinc-400 text-sm mt-1 font-medium">
             Manage cafeteria orders, dine-in table status, takeaway packaging, and per-day bar expenses.
           </p>
         </div>
 
         {/* View Mode Switcher */}
-        <div className="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 border border-slate-300">
+        <div className="bg-zinc-900 p-1.5 rounded-2xl flex gap-1 border border-zinc-800 shadow-xl">
           <button
             onClick={() => setActiveTabMode('pos')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
               activeTabMode === 'pos'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                ? 'bg-lime-400 text-zinc-950 shadow-lg shadow-lime-400/20'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
             }`}
           >
-            <Coffee className="w-4 h-4 text-amber-400" />
+            <Coffee className="w-4 h-4" />
             <span>Bar POS & Tables</span>
           </button>
 
           <button
             onClick={() => setActiveTabMode('expenses')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
               activeTabMode === 'expenses'
-                ? 'bg-slate-900 text-white shadow-md'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+                ? 'bg-lime-400 text-zinc-950 shadow-lg shadow-lime-400/20'
+                : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
             }`}
           >
-            <Receipt className="w-4 h-4 text-amber-400" />
+            <Receipt className="w-4 h-4" />
             <span>Per-Day Bar Expenses</span>
           </button>
         </div>
@@ -228,34 +164,34 @@ export default function BarPOSPage({ user }) {
         <DailyBarExpenseTracker userRole={user?.role} />
       ) : (
         <div className="space-y-8">
-
+          
           {/* Cafeteria Table Occupancy & Packaging Status Floor Map */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-zinc-800">
               <div>
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <Utensils className="w-5 h-5 text-amber-500" /> Cafeteria Table Occupancy & Status Map
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Utensils className="w-5 h-5 text-lime-400" /> Cafeteria Table Occupancy & Status Map
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <p className="text-xs text-zinc-400 mt-0.5 font-medium">
                   Live table status indicator. Tables in use are blocked for other customers until settled.
                 </p>
               </div>
 
               <div className="flex items-center gap-3 text-xs font-bold">
-                <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   <span>Empty / Available</span>
                 </span>
 
-                <span className="flex items-center gap-1.5 text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
-                  <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span className="flex items-center gap-1.5 text-rose-400 bg-rose-500/10 px-3 py-1 rounded-full border border-rose-500/20">
+                  <span className="w-2 h-2 rounded-full bg-rose-400"></span>
                   <span>In Use / Occupied</span>
                 </span>
               </div>
             </div>
 
-            {/* Table Floor Cards Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            {/* Table Floor Cards Grid (Increased size for maximum visibility) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {CAFETERIA_TABLES.map(tblName => {
                 const occTab = getOccupyingTab(tblName);
                 const isOccupied = !!occTab;
@@ -263,43 +199,43 @@ export default function BarPOSPage({ user }) {
                 return (
                   <div
                     key={tblName}
-                    className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all ${
-                      isOccupied
-                        ? 'bg-rose-50/80 border-rose-200 shadow-sm'
-                        : 'bg-slate-50 border-slate-200 hover:border-sky-400'
+                    className={`p-6 rounded-3xl border flex flex-col justify-between transition-all min-h-[160px] ${
+                      isOccupied 
+                        ? 'bg-rose-950/20 border-rose-800/40 shadow-md' 
+                        : 'bg-zinc-900 border-zinc-800 hover:border-lime-400/60 shadow-lg'
                     }`}
                   >
                     <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="font-extrabold text-xs text-slate-900 flex items-center gap-1">
-                          <MapPin className={`w-3.5 h-3.5 ${isOccupied ? 'text-rose-500' : 'text-slate-400'}`} />
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="font-black text-sm text-white flex items-center gap-1.5">
+                          <MapPin className={`w-4 h-4 ${isOccupied ? 'text-rose-400' : 'text-lime-400'}`} />
                           {tblName}
                         </span>
-                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
-                          isOccupied
-                            ? 'bg-rose-600 text-white'
-                            : 'bg-emerald-100 text-emerald-800'
+                        <span className={`text-[10px] font-black uppercase px-2.5 py-1 rounded-full ${
+                          isOccupied 
+                            ? 'bg-rose-500 text-white shadow-xs' 
+                            : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                         }`}>
                           {isOccupied ? 'In Use' : 'Empty'}
                         </span>
                       </div>
 
                       {isOccupied ? (
-                        <div className="text-[11px] text-slate-700 space-y-0.5 mt-2">
-                          <div className="font-bold truncate">{occTab.customerName}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">{occTab.tabNumber}</div>
-                          <div className="font-extrabold text-emerald-600 text-xs">${occTab.finalAmount.toFixed(2)}</div>
+                        <div className="text-xs text-zinc-300 space-y-1 mt-3">
+                          <div className="font-bold text-white text-sm truncate">{occTab.customerName}</div>
+                          <div className="text-xs text-zinc-400 font-mono font-bold">{occTab.tabNumber}</div>
+                          <div className="font-black text-lime-400 text-base mt-2">${occTab.finalAmount.toFixed(2)}</div>
                         </div>
                       ) : (
-                        <div className="text-[11px] text-slate-400 italic mt-2">Available for customers</div>
+                        <div className="text-xs text-zinc-400 font-medium italic mt-3">Available for customers</div>
                       )}
                     </div>
 
-                    <div className="mt-3 pt-2 border-t border-slate-200/80">
+                    <div className="mt-5 pt-3 border-t border-zinc-800">
                       {isOccupied ? (
                         <button
                           onClick={() => setSettleModalTab(occTab)}
-                          className="w-full py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] rounded-xl transition shadow-xs"
+                          className="w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-2xl transition shadow-md"
                         >
                           Settle & Free Table
                         </button>
@@ -309,7 +245,7 @@ export default function BarPOSPage({ user }) {
                             setOrderType('DINE_IN');
                             setTableNumber(tblName);
                           }}
-                          className="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] rounded-xl transition"
+                          className="w-full py-2.5 px-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-extrabold text-xs rounded-2xl transition border border-zinc-700/50"
                         >
                           + Assign Order
                         </button>
@@ -321,50 +257,33 @@ export default function BarPOSPage({ user }) {
             </div>
           </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         {/* Menu Grid (2 Columns) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-2 border-b border-slate-100">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">Bar & Kitchen Menu</h3>
-                <p className="text-xs text-slate-400">Click items to add to current order cart</p>
-              </div>
-
-              <button
-                onClick={() => setShowAddBarModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
-              >
-                + Add Bar Menu Item
-              </button>
-            </div>
+          <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+            <h3 className="text-lg font-bold text-white mb-4 pb-3 border-b border-zinc-800 flex items-center justify-between">
+              <span>Bar & Kitchen Menu</span>
+              <span className="text-xs text-zinc-400 font-medium">Click items to add to current order</span>
+            </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {menuItems.map(item => (
                 <div
                   key={item.id}
                   onClick={() => addToOrderCart(item)}
-                  className="bg-slate-50 p-4 rounded-2xl border border-slate-200 hover:border-sky-500 hover:bg-sky-50/50 cursor-pointer transition flex flex-col justify-between group relative"
+                  className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 hover:border-lime-400/60 hover:bg-zinc-800/40 cursor-pointer transition flex flex-col justify-between group"
                 >
                   <div>
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full uppercase">
-                        {item.category}
-                      </span>
-                      <button
-                        onClick={(e) => handleDeleteBarItem(e, item.id, item.name)}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 hover:bg-slate-200 rounded transition"
-                        title="Delete menu item"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <h4 className="font-bold text-slate-900 text-sm mt-2">{item.name}</h4>
+                    <span className="text-[10px] font-black text-lime-400 bg-lime-400/10 px-2 py-0.5 rounded-full uppercase border border-lime-400/20">
+                      {item.category}
+                    </span>
+                    <h4 className="font-bold text-white text-sm mt-2">{item.name}</h4>
                   </div>
-                  <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-200/60">
-                    <span className="font-extrabold text-slate-900 text-sm">${item.price.toFixed(2)}</span>
-                    <span className="w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center font-bold text-xs">
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800/80">
+                    <span className="font-black text-white text-base">${item.price.toFixed(2)}</span>
+                    <span className="w-7 h-7 rounded-xl bg-lime-400 text-zinc-950 flex items-center justify-center font-black text-xs shadow-md shadow-lime-400/20 group-hover:scale-105 transition-transform">
                       +
                     </span>
                   </div>
@@ -374,41 +293,41 @@ export default function BarPOSPage({ user }) {
           </div>
 
           {/* Active Open Tabs List */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+            <h3 className="text-lg font-bold text-white mb-4 pb-3 border-b border-zinc-800 flex items-center justify-between">
               <span>Active Open Tabs ({openTabs.length})</span>
-              <span className="text-xs text-slate-400 font-normal">Tabs can run until settled before leaving</span>
+              <span className="text-xs text-zinc-400 font-medium">Tabs can run until settled before leaving</span>
             </h3>
 
             {openTabs.length === 0 ? (
-              <div className="py-6 text-center text-xs text-slate-400 italic">No open tabs right now.</div>
+              <div className="py-8 text-center text-xs text-zinc-500 italic">No open tabs right now.</div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {openTabs.map(tab => (
-                  <div key={tab.id} className="bg-slate-900 text-white p-4 rounded-2xl space-y-3">
+                  <div key={tab.id} className="bg-zinc-950 border border-zinc-800 text-white p-5 rounded-2xl space-y-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider">{tab.tabNumber}</span>
-                        <h4 className="font-bold text-base text-white mt-0.5">{tab.customerName}</h4>
-                        <div className="text-xs text-slate-400">{tab.tableNumber || 'Patio Table'}</div>
+                        <span className="text-[10px] font-mono font-bold text-lime-400 uppercase tracking-wider">{tab.tabNumber}</span>
+                        <h4 className="font-black text-base text-white mt-0.5">{tab.customerName}</h4>
+                        <div className="text-xs text-zinc-400">{tab.tableNumber || 'Patio Table'}</div>
                       </div>
-                      <span className="text-xs font-bold text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800">
+                      <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-2.5 py-1 rounded-full border border-amber-400/20">
                         {tab.discountPercent}% OFF Tier
                       </span>
                     </div>
 
-                    <div className="text-xs space-y-1 text-slate-300 pt-2 border-t border-slate-800">
+                    <div className="text-xs space-y-1.5 text-zinc-300 pt-3 border-t border-zinc-800">
                       {tab.items?.map(i => (
                         <div key={i.id} className="flex justify-between">
-                          <span>{i.quantity}x {i.barItem?.name}</span>
-                          <span className="font-mono text-slate-400">${i.totalPrice.toFixed(2)}</span>
+                          <span className="text-zinc-300">{i.quantity}x {i.barItem?.name}</span>
+                          <span className="font-mono text-zinc-400">${i.totalPrice.toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
 
-                    <div className="flex justify-between items-center pt-2 border-t border-slate-800 font-bold">
-                      <span className="text-xs text-slate-400">Total:</span>
-                      <span className="text-lg text-emerald-400">${tab.finalAmount.toFixed(2)}</span>
+                    <div className="flex justify-between items-center pt-3 border-t border-zinc-800 font-bold">
+                      <span className="text-xs text-zinc-400">Total:</span>
+                      <span className="text-xl font-black text-lime-400">${tab.finalAmount.toFixed(2)}</span>
                     </div>
 
                     <div className="flex gap-2 pt-2">
@@ -418,13 +337,13 @@ export default function BarPOSPage({ user }) {
                           setSelectedMemberId(tab.memberId || '');
                           setTableNumber(tab.tableNumber || '');
                         }}
-                        className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl text-slate-200"
+                        className="flex-1 py-2 bg-zinc-800 hover:bg-zinc-700 text-xs font-bold rounded-xl text-zinc-200 border border-zinc-700/50"
                       >
                         Add Items
                       </button>
                       <button
                         onClick={() => setSettleModalTab(tab)}
-                        className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-xs font-bold rounded-xl text-white shadow-sm"
+                        className="flex-1 py-2 bg-lime-400 hover:bg-lime-300 text-xs font-black rounded-xl text-zinc-950 shadow-md shadow-lime-400/20"
                       >
                         Settle Tab
                       </button>
@@ -438,40 +357,40 @@ export default function BarPOSPage({ user }) {
 
         {/* Current Order Builder */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm sticky top-24 space-y-4">
-            <h3 className="text-lg font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl sticky top-24 space-y-4">
+            <h3 className="text-lg font-bold text-white pb-3 border-b border-zinc-800 flex items-center justify-between">
               <span>{selectedTab ? `Adding to ${selectedTab.tabNumber}` : 'New Bar Order / Tab'}</span>
               {selectedTab && (
-                <button onClick={() => setSelectedTab(null)} className="text-xs text-rose-600 font-semibold">
+                <button onClick={() => setSelectedTab(null)} className="text-xs text-rose-400 font-bold hover:underline">
                   Cancel Edit
                 </button>
               )}
             </h3>
 
             {formError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-start gap-2 animate-in fade-in">
-                <AlertOctagon className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+              <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs rounded-xl flex items-start gap-2 animate-in fade-in">
+                <AlertOctagon className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
                 <span className="font-medium">{formError}</span>
               </div>
             )}
 
-            {/* Order Type Toggle: Dine-in vs Takeaway (Empty vs Packed) */}
+            {/* Order Type Toggle: Dine-in vs Takeaway */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Dining & Packaging Type</label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Dining & Packaging Type</label>
+              <div className="grid grid-cols-2 gap-2 p-1.5 bg-zinc-950 rounded-2xl border border-zinc-800">
                 <button
                   type="button"
                   onClick={() => {
                     setOrderType('DINE_IN');
                     setFormError('');
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition ${
                     orderType === 'DINE_IN'
-                      ? 'bg-slate-900 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-lime-400 text-zinc-950 shadow-md'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
-                  <Utensils className="w-3.5 h-3.5 text-amber-400" />
+                  <Utensils className="w-3.5 h-3.5" />
                   <span>Dine-In (Table)</span>
                 </button>
 
@@ -481,107 +400,87 @@ export default function BarPOSPage({ user }) {
                     setOrderType('TAKEAWAY');
                     setFormError('');
                   }}
-                  className={`py-2 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition ${
                     orderType === 'TAKEAWAY'
-                      ? 'bg-amber-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-amber-400 text-zinc-950 shadow-md'
+                      : 'text-zinc-400 hover:text-white'
                   }`}
                 >
-                  <PackageCheck className="w-3.5 h-3.5 text-white" />
+                  <PackageCheck className="w-3.5 h-3.5" />
                   <span>Packed / Takeaway</span>
                 </button>
               </div>
             </div>
 
             {/* Select Member for Discount */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  {isMemberRole ? 'Member Account (Automatic Tier Discount)' : 'Select Member (Automatic Discount)'}
-                </label>
-                {isMemberRole ? (
-                  <select
-                    value={selectedMemberId || (loggedInMember ? loggedInMember.id : '')}
-                    disabled
-                    className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 cursor-not-allowed shadow-xs"
-                  >
-                    {loggedInMember ? (
-                      <option value={loggedInMember.id}>
-                        {loggedInMember.name} ({loggedInMember.tier?.name || 'Member'} - {loggedInMember.tier?.barDiscountPercent || 0}% Off)
-                      </option>
-                    ) : (
-                      <option value="">
-                        {user?.name || 'Logged-in Member'} ({memberDiscountPercent}% Off)
-                      </option>
-                    )}
-                  </select>
-                ) : (
-                  <select
-                    value={selectedMemberId}
-                    onChange={(e) => setSelectedMemberId(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-sky-500"
-                  >
-                    <option value="">Guest Customer (0% Discount)</option>
-                    {members.map(m => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} ({m.tier?.name} - {m.tier?.barDiscountPercent}% Off)
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Select Member (Automatic Discount)</label>
+                <select
+                  value={selectedMemberId}
+                  onChange={(e) => setSelectedMemberId(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-medium text-white focus:ring-1 focus:ring-lime-400 focus:border-lime-400"
+                >
+                  <option value="">Guest Customer (0% Discount)</option>
+                  {members.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({m.tier?.name} - {m.tier?.barDiscountPercent}% Off)
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Table Selection (Shown for Dine-In) */}
               {orderType === 'DINE_IN' ? (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Select Cafeteria Table</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Select Cafeteria Table</label>
                   <select
                     value={tableNumber}
                     onChange={(e) => {
                       setTableNumber(e.target.value);
                       setFormError('');
                     }}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-3 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs font-bold text-white focus:ring-1 focus:ring-lime-400 focus:border-lime-400"
                   >
                     {CAFETERIA_TABLES.map(tbl => {
                       const occ = getOccupyingTab(tbl);
                       return (
                         <option key={tbl} value={tbl} disabled={!!occ}>
-                          {tbl} {occ ? `ðŸ”´ (IN USE by ${occ.customerName})` : 'ðŸŸ¢ (Empty / Available)'}
+                          {tbl} {occ ? `🔴 (IN USE by ${occ.customerName})` : '🟢 (Empty / Available)'}
                         </option>
                       );
                     })}
                   </select>
                 </div>
               ) : (
-                <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-xs text-amber-800 flex items-center gap-2">
-                  <PackageCheck className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <div className="bg-amber-400/10 border border-amber-400/20 p-3 rounded-xl text-xs text-amber-300 flex items-center gap-2">
+                  <PackageCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
                   <span>Order marked as <strong>Packed / Parcel Takeaway</strong>. No dining table assigned.</span>
                 </div>
               )}
             </div>
 
             {memberDiscountPercent > 0 && (
-              <div className="bg-emerald-50 text-emerald-800 text-xs p-2.5 rounded-xl border border-emerald-200 mb-4 flex items-center gap-1.5 font-semibold">
-                <Tag className="w-4 h-4 text-emerald-600" />
+              <div className="bg-lime-400/10 text-lime-300 text-xs p-3 rounded-xl border border-lime-400/20 mb-4 flex items-center gap-2 font-bold">
+                <Tag className="w-4 h-4 text-lime-400" />
                 <span>{selectedMember?.tier?.name} Member Discount: <strong>{memberDiscountPercent}% OFF</strong></span>
               </div>
             )}
 
             {/* Cart Items */}
             {orderCart.length === 0 ? (
-              <div className="py-8 text-center text-xs text-slate-400 italic">
+              <div className="py-8 text-center text-xs text-zinc-500 italic">
                 Click menu items on left to build order.
               </div>
             ) : (
-              <div className="space-y-2 mb-4 max-h-56 overflow-y-auto">
+              <div className="space-y-2 mb-4 max-h-56 overflow-y-auto pr-1">
                 {orderCart.map(i => (
-                  <div key={i.barItemId} className="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl text-xs">
+                  <div key={i.barItemId} className="flex justify-between items-center bg-zinc-950 p-3 rounded-xl text-xs border border-zinc-800/80">
                     <div>
-                      <div className="font-bold text-slate-800">{i.name}</div>
-                      <div className="text-slate-400">{i.quantity}x @ ${i.price.toFixed(2)}</div>
+                      <div className="font-bold text-white">{i.name}</div>
+                      <div className="text-zinc-500">{i.quantity}x @ ${i.price.toFixed(2)}</div>
                     </div>
-                    <span className="font-extrabold text-slate-900">${(i.price * i.quantity).toFixed(2)}</span>
+                    <span className="font-black text-lime-400 text-sm">${(i.price * i.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -590,10 +489,10 @@ export default function BarPOSPage({ user }) {
             <button
               onClick={handleSaveTabOrder}
               disabled={orderCart.length === 0}
-              className={`w-full py-3 rounded-xl font-bold text-sm shadow-md transition ${
+              className={`w-full py-3.5 rounded-xl font-black text-sm shadow-xl transition ${
                 orderCart.length === 0
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                  : 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-600/20'
+                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed border border-zinc-700/50'
+                  : 'bg-lime-400 hover:bg-lime-300 text-zinc-950 shadow-lime-400/20'
               }`}
             >
               Send to Open Tab
@@ -605,28 +504,28 @@ export default function BarPOSPage({ user }) {
 
       {/* Settle Tab Modal (Cash / Card / UPI) */}
       {settleModalTab && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
-            <h3 className="text-xl font-extrabold text-slate-900 mb-1">Settle Tab #{settleModalTab.tabNumber}</h3>
-            <p className="text-xs text-slate-500 mb-4">Customer: <strong>{settleModalTab.customerName}</strong></p>
+        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-zinc-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-zinc-800 text-white">
+            <h3 className="text-2xl font-black text-white mb-1">Settle Tab #{settleModalTab.tabNumber}</h3>
+            <p className="text-xs text-zinc-400 mb-6">Customer: <strong className="text-white">{settleModalTab.customerName}</strong></p>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6 space-y-2 text-xs">
-              <div className="flex justify-between text-slate-500">
+            <div className="bg-zinc-950 p-5 rounded-2xl border border-zinc-800 mb-6 space-y-2.5 text-xs">
+              <div className="flex justify-between text-zinc-400">
                 <span>Subtotal:</span>
                 <span>${settleModalTab.totalAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-emerald-600 font-semibold">
+              <div className="flex justify-between text-lime-400 font-bold">
                 <span>Tier Discount ({settleModalTab.discountPercent}%):</span>
                 <span>-${settleModalTab.discountAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
+              <div className="flex justify-between text-base font-black text-white pt-3 border-t border-zinc-800">
                 <span>Final Due Amount:</span>
-                <span className="text-emerald-600">${settleModalTab.finalAmount.toFixed(2)}</span>
+                <span className="text-lime-400 text-xl font-black">${settleModalTab.finalAmount.toFixed(2)}</span>
               </div>
             </div>
 
             <div className="space-y-3 mb-6">
-              <label className="block text-xs font-semibold text-slate-700">Select Payment Mode</label>
+              <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider">Select Payment Mode</label>
               <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'UPI', label: 'UPI / QR', icon: QrCode },
@@ -640,10 +539,10 @@ export default function BarPOSPage({ user }) {
                       key={mode.id}
                       type="button"
                       onClick={() => setPaymentMethod(mode.id)}
-                      className={`p-3 rounded-2xl border flex flex-col items-center gap-1.5 text-xs font-bold transition ${
+                      className={`p-3.5 rounded-2xl border flex flex-col items-center gap-2 text-xs font-bold transition ${
                         isSelected
-                          ? 'border-sky-600 bg-sky-50 text-sky-700 ring-2 ring-sky-100'
-                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          ? 'border-lime-400 bg-lime-400/10 text-lime-400 ring-2 ring-lime-400/20'
+                          : 'border-zinc-800 text-zinc-400 hover:bg-zinc-800'
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -654,112 +553,21 @@ export default function BarPOSPage({ user }) {
               </div>
             </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <div className="flex justify-end gap-3 pt-4 border-t border-zinc-800">
               <button
                 type="button"
                 onClick={() => setSettleModalTab(null)}
-                className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl text-sm font-semibold"
+                className="px-5 py-2.5 text-zinc-400 hover:bg-zinc-800 rounded-xl text-xs font-bold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSettleTab}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-600/20"
+                className="px-6 py-2.5 bg-lime-400 hover:bg-lime-300 text-zinc-950 rounded-xl text-xs font-black shadow-lg shadow-lime-400/20"
               >
                 Confirm Payment & Close Tab
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add New Bar Menu Item Modal */}
-      {showAddBarModal && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-100">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-              <h3 className="text-lg font-extrabold text-slate-900">Add New Bar & Kitchen Item</h3>
-              <button onClick={() => setShowAddBarModal(false)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {barModalError && (
-              <div className="mt-3 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
-                {barModalError}
-              </div>
-            )}
-
-            <form onSubmit={handleCreateBarItem} className="mt-4 space-y-3 text-xs">
-              <div>
-                <label className="block font-semibold text-slate-700 mb-1">Item Name *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Cold Brew Iced Coffee"
-                  value={newBarItem.name}
-                  onChange={(e) => setNewBarItem({ ...newBarItem, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 font-medium"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Category *</label>
-                  <select
-                    value={newBarItem.category}
-                    onChange={(e) => setNewBarItem({ ...newBarItem, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 font-medium"
-                  >
-                    <option value="BEVERAGE">BEVERAGE</option>
-                    <option value="SNACK">SNACK</option>
-                    <option value="MEAL">MEAL</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Price ($) *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    placeholder="5.50"
-                    value={newBarItem.price}
-                    onChange={(e) => setNewBarItem({ ...newBarItem, price: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 font-medium"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="isAvailable"
-                  checked={newBarItem.isAvailable}
-                  onChange={(e) => setNewBarItem({ ...newBarItem, isAvailable: e.target.checked })}
-                  className="w-4 h-4 text-amber-600 rounded border-slate-300 focus:ring-amber-500"
-                />
-                <label htmlFor="isAvailable" className="text-xs font-semibold text-slate-700">
-                  Available for ordering on POS
-                </label>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setShowAddBarModal(false)}
-                  className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow-md shadow-amber-600/20"
-                >
-                  Save Item to Menu
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}

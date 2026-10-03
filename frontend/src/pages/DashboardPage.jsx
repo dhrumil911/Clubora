@@ -72,22 +72,22 @@ export default function DashboardPage() {
   const convRate = totalLeads > 0 ? Math.round((converted / totalLeads) * 100) : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-8 bg-zinc-950 text-zinc-100 min-h-screen">
       
       {/* Header & Period Selector */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-            <LayoutDashboard className="w-7 h-7 text-sky-600" /> Executive Analytics & Financial Control
+          <h1 className="text-2xl font-black text-white flex items-center gap-2.5">
+            <LayoutDashboard className="w-7 h-7 text-lime-400" /> Executive Analytics & Financial Control
           </h1>
-          <p className="text-slate-500 text-xs mt-1">
+          <p className="text-zinc-400 text-xs mt-1 font-medium">
             Consolidated real-time operational revenue across Courts, Gear Shop POS, Bar Cafeteria & Corporate Receivables.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
           {/* Time Filter Buttons */}
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+          <div className="flex items-center gap-1.5 bg-zinc-950 p-1.5 rounded-2xl border border-zinc-800">
             {[
               { key: 'all', label: 'All Time' },
               { key: 'today', label: 'Today' },
@@ -99,8 +99,8 @@ export default function DashboardPage() {
                 onClick={() => setPeriod(t.key)}
                 className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition ${
                   period === t.key
-                    ? 'bg-slate-900 text-white shadow-md'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                    ? 'bg-lime-400 text-zinc-950 font-black shadow-lg shadow-lime-400/20'
+                    : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
                 }`}
               >
                 {t.label}
@@ -112,7 +112,7 @@ export default function DashboardPage() {
           <button
             onClick={() => downloadFinanceReportPDF(data, period)}
             disabled={!data || !data.metrics}
-            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 bg-lime-400 hover:bg-lime-300 text-zinc-950 rounded-2xl text-xs font-black shadow-lg shadow-lime-400/20 transition active:scale-95 cursor-pointer"
             title="Download executive financial summary in PDF format"
           >
             <Download className="w-4 h-4" /> Download Finance PDF
@@ -124,59 +124,59 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
         {/* Total Combined Revenue */}
-        <div className="bg-gradient-to-tr from-slate-950 via-slate-900 to-sky-950 text-white p-6 rounded-3xl border border-slate-800 shadow-xl relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl relative overflow-hidden flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-sky-400 uppercase tracking-wider">Total Revenue</span>
-              <span className="px-2 py-0.5 bg-sky-500/20 text-sky-300 rounded-full text-[10px] font-extrabold">AGGREGATED</span>
+              <span className="text-[10px] font-black text-lime-400 uppercase tracking-wider">Total Revenue</span>
+              <span className="px-2.5 py-0.5 bg-lime-400/10 text-lime-400 rounded-full text-[9px] font-black border border-lime-400/30">AGGREGATED</span>
             </div>
-            <div className="text-3xl font-extrabold mt-3 text-white">${totalRev.toFixed(2)}</div>
+            <div className="text-3xl font-black mt-3 text-white">${totalRev.toFixed(2)}</div>
           </div>
-          <div className="mt-4 flex items-center gap-1.5 text-xs text-emerald-400 font-semibold border-t border-slate-800/80 pt-3">
+          <div className="mt-4 flex items-center gap-1.5 text-xs text-lime-400 font-bold border-t border-zinc-800/80 pt-3">
             <TrendingUp className="w-4 h-4" /> Direct & recurring cash inflow
           </div>
         </div>
 
         {/* Court Bookings */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Court Bookings</span>
-              <div className="p-2.5 bg-sky-50 text-sky-600 rounded-2xl"><Calendar className="w-4 h-4" /></div>
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Court Bookings</span>
+              <div className="p-2.5 bg-sky-400/10 text-sky-400 rounded-2xl border border-sky-400/20"><Calendar className="w-4 h-4" /></div>
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 mt-2">${(metrics.courtRevenue || 0).toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-2">${(metrics.courtRevenue || 0).toFixed(2)}</div>
           </div>
-          <div className="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100 flex justify-between">
-            <span>Share: <strong>{courtPct}%</strong></span>
-            <span className="text-sky-600 font-semibold">{metrics.todayBookings || 0} bookings today</span>
+          <div className="text-xs text-zinc-400 mt-3 pt-2 border-t border-zinc-800 flex justify-between">
+            <span>Share: <strong className="text-zinc-200">{courtPct}%</strong></span>
+            <span className="text-sky-400 font-bold">{metrics.todayBookings || 0} bookings today</span>
           </div>
         </div>
 
         {/* Gear Shop POS */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Gear Shop POS</span>
-              <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl"><ShoppingBag className="w-4 h-4" /></div>
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Gear Shop POS</span>
+              <div className="p-2.5 bg-purple-400/10 text-purple-400 rounded-2xl border border-purple-400/20"><ShoppingBag className="w-4 h-4" /></div>
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 mt-2">${(metrics.shopRevenue || 0).toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-2">${(metrics.shopRevenue || 0).toFixed(2)}</div>
           </div>
-          <div className="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">
-            Share: <strong>{shopPct}%</strong> &bull; Counter & Online gear
+          <div className="text-xs text-zinc-400 mt-3 pt-2 border-t border-zinc-800">
+            Share: <strong className="text-zinc-200">{shopPct}%</strong> &bull; Counter & Online gear
           </div>
         </div>
 
         {/* Bar & Cafeteria */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col justify-between">
           <div>
             <div className="flex justify-between items-start">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bar & Cafeteria</span>
-              <div className="p-2.5 bg-amber-50 text-amber-600 rounded-2xl"><Coffee className="w-4 h-4" /></div>
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Bar & Cafeteria</span>
+              <div className="p-2.5 bg-amber-400/10 text-amber-400 rounded-2xl border border-amber-400/20"><Coffee className="w-4 h-4" /></div>
             </div>
-            <div className="text-2xl font-extrabold text-slate-900 mt-2">${(metrics.barRevenue || 0).toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-2">${(metrics.barRevenue || 0).toFixed(2)}</div>
           </div>
-          <div className="text-xs text-slate-500 mt-3 pt-2 border-t border-slate-100">
-            Share: <strong>{barPct}%</strong> &bull; Settled member tabs
+          <div className="text-xs text-zinc-400 mt-3 pt-2 border-t border-zinc-800">
+            Share: <strong className="text-zinc-200">{barPct}%</strong> &bull; Settled member tabs
           </div>
         </div>
 
@@ -186,91 +186,91 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Revenue Distribution Progress Bars */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-5">
-          <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <Percent className="w-5 h-5 text-sky-600" /> Revenue Distribution by Stream
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl space-y-5">
+          <div className="flex justify-between items-center pb-3 border-b border-zinc-800">
+            <h3 className="text-base font-black text-white flex items-center gap-2">
+              <Percent className="w-5 h-5 text-lime-400" /> Revenue Distribution by Stream
             </h3>
-            <span className="text-xs font-semibold text-slate-400">Total: ${totalRev.toFixed(2)}</span>
+            <span className="text-xs font-bold text-zinc-400">Total: ${totalRev.toFixed(2)}</span>
           </div>
 
           <div className="space-y-4">
             {/* Courts */}
             <div>
-              <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-bold text-zinc-300 mb-1">
                 <span>Courts & Scheduler</span>
                 <span>${(metrics.courtRevenue || 0).toFixed(2)} ({courtPct}%)</span>
               </div>
-              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-sky-500 rounded-full transition-all duration-500" style={{ width: `${courtPct}%` }}></div>
+              <div className="w-full h-3 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+                <div className="h-full bg-lime-400 rounded-full transition-all duration-500" style={{ width: `${courtPct}%` }}></div>
               </div>
             </div>
 
             {/* Gear Shop */}
             <div>
-              <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-bold text-zinc-300 mb-1">
                 <span>Gear Shop & Equipment POS</span>
                 <span>${(metrics.shopRevenue || 0).toFixed(2)} ({shopPct}%)</span>
               </div>
-              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-500 rounded-full transition-all duration-500" style={{ width: `${shopPct}%` }}></div>
+              <div className="w-full h-3 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+                <div className="h-full bg-purple-400 rounded-full transition-all duration-500" style={{ width: `${shopPct}%` }}></div>
               </div>
             </div>
 
             {/* Bar & Cafeteria */}
             <div>
-              <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-bold text-zinc-300 mb-1">
                 <span>Bar & Cafeteria POS</span>
                 <span>${(metrics.barRevenue || 0).toFixed(2)} ({barPct}%)</span>
               </div>
-              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${barPct}%` }}></div>
+              <div className="w-full h-3 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+                <div className="h-full bg-amber-400 rounded-full transition-all duration-500" style={{ width: `${barPct}%` }}></div>
               </div>
             </div>
 
             {/* Memberships */}
             <div>
-              <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
+              <div className="flex justify-between text-xs font-bold text-zinc-300 mb-1">
                 <span>Active Member Subscriptions</span>
                 <span>${(metrics.membershipRevenue || 0).toFixed(2)} ({memPct}%)</span>
               </div>
-              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${memPct}%` }}></div>
+              <div className="w-full h-3 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800">
+                <div className="h-full bg-emerald-400 rounded-full transition-all duration-500" style={{ width: `${memPct}%` }}></div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Lead Funnel & CRM Conversion */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-5">
-          <div className="flex justify-between items-center pb-3 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <Target className="w-5 h-5 text-indigo-600" /> CRM Lead Funnel Conversion
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl space-y-5">
+          <div className="flex justify-between items-center pb-3 border-b border-zinc-800">
+            <h3 className="text-base font-black text-white flex items-center gap-2">
+              <Target className="w-5 h-5 text-lime-400" /> CRM Lead Funnel Conversion
             </h3>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            <span className="text-xs font-black text-lime-400 bg-lime-400/10 px-3 py-1 rounded-full border border-lime-400/30">
               {convRate}% Conversion Rate
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-400 uppercase">New Enquiries</div>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{newLeads}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-center">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">New Enquiries</div>
+              <div className="text-2xl font-black text-white mt-1">{newLeads}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-400 uppercase">Contacted Staff</div>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{contacted}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-center">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Contacted Staff</div>
+              <div className="text-2xl font-black text-white mt-1">{contacted}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-400 uppercase">Trial Sessions Booked</div>
-              <div className="text-2xl font-extrabold text-sky-600 mt-1">{trialBooked}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-center">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Trial Sessions Booked</div>
+              <div className="text-2xl font-black text-sky-400 mt-1">{trialBooked}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center">
-              <div className="text-[11px] font-bold text-slate-400 uppercase">Converted Members</div>
-              <div className="text-2xl font-extrabold text-emerald-600 mt-1">{converted}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-center">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Converted Members</div>
+              <div className="text-2xl font-black text-lime-400 mt-1">{converted}</div>
             </div>
           </div>
         </div>
@@ -281,43 +281,43 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* Payment Channels Distribution */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-          <h3 className="text-base font-extrabold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+          <h3 className="text-base font-black text-white mb-4 pb-3 border-b border-zinc-800 flex items-center justify-between">
             <span>Payment Channels Distribution</span>
-            <CreditCard className="w-5 h-5 text-slate-400" />
+            <CreditCard className="w-5 h-5 text-zinc-400" />
           </h3>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="text-xs font-bold text-slate-400 uppercase">UPI / QR Code</div>
-              <div className="text-xl font-extrabold text-slate-900 mt-1">${(paymentMethods.UPI || 0).toFixed(2)}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">UPI / QR Code</div>
+              <div className="text-xl font-black text-white mt-1">${(paymentMethods.UPI || 0).toFixed(2)}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="text-xs font-bold text-slate-400 uppercase">Card Swipe</div>
-              <div className="text-xl font-extrabold text-slate-900 mt-1">${(paymentMethods.CARD || 0).toFixed(2)}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Card Swipe</div>
+              <div className="text-xl font-black text-white mt-1">${(paymentMethods.CARD || 0).toFixed(2)}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="text-xs font-bold text-slate-400 uppercase">Cash at Counter</div>
-              <div className="text-xl font-extrabold text-slate-900 mt-1">${(paymentMethods.CASH || 0).toFixed(2)}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Cash at Counter</div>
+              <div className="text-xl font-black text-white mt-1">${(paymentMethods.CASH || 0).toFixed(2)}</div>
             </div>
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              <div className="text-xs font-bold text-slate-400 uppercase">Online Website Portal</div>
-              <div className="text-xl font-extrabold text-slate-900 mt-1">${(paymentMethods.ONLINE || 0).toFixed(2)}</div>
+            <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider">Online Website Portal</div>
+              <div className="text-xl font-black text-white mt-1">${(paymentMethods.ONLINE || 0).toFixed(2)}</div>
             </div>
           </div>
         </div>
 
         {/* Corporate Invoices & Outstanding Bills */}
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-slate-400" /> Corporate Invoices & Receivables
+        <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+            <h3 className="text-base font-black text-white flex items-center gap-2">
+              <FileText className="w-5 h-5 text-zinc-400" /> Corporate Invoices & Receivables
             </h3>
             {metrics.totalOwed > 0 && (
-              <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+              <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
                 ${metrics.totalOwed.toFixed(2)} Outstanding
               </span>
             )}
@@ -325,18 +325,18 @@ export default function DashboardPage() {
 
           <div className="space-y-3">
             {invoices.length === 0 ? (
-              <div className="text-xs text-slate-400 py-6 text-center">No corporate invoices found.</div>
+              <div className="text-xs text-zinc-500 py-6 text-center">No corporate invoices found.</div>
             ) : (
               invoices.slice(0, 4).map(inv => (
-                <div key={inv.id} className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100 flex items-center justify-between">
+                <div key={inv.id} className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 flex items-center justify-between">
                   <div>
-                    <div className="font-bold text-slate-900 text-sm">{inv.clientName}</div>
-                    <div className="text-xs text-slate-400 font-mono">Invoice #{inv.invoiceNumber} &bull; Due: {inv.dueDate}</div>
+                    <div className="font-bold text-white text-sm">{inv.clientName}</div>
+                    <div className="text-xs text-zinc-400 font-mono">Invoice #{inv.invoiceNumber} &bull; Due: {inv.dueDate}</div>
                   </div>
                   <div className="text-right">
-                    <div className="font-extrabold text-slate-900 text-sm">${inv.amount.toFixed(2)}</div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block mt-0.5 ${
-                      inv.status === 'PAID' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                    <div className="font-black text-white text-sm">${inv.amount.toFixed(2)}</div>
+                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                      inv.status === 'PAID' ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/30' : 'bg-amber-400/10 text-amber-400 border border-amber-400/30'
                     }`}>
                       {inv.status}
                     </span>
@@ -350,13 +350,13 @@ export default function DashboardPage() {
       </div>
 
       {/* Staff Shift Scheduling Operational Summary */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-        <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-          <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-slate-400" /> Staff Roster Operations Overview
+      <div className="bg-zinc-900 p-6 rounded-3xl border border-zinc-800 shadow-2xl">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
+          <h3 className="text-base font-black text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-zinc-400" /> Staff Roster Operations Overview
           </h3>
           {metrics.pendingLeaves > 0 && (
-            <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+            <span className="text-xs font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/30">
               {metrics.pendingLeaves} Pending Leave Request(s)
             </span>
           )}
@@ -364,16 +364,16 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {shifts.length === 0 ? (
-            <div className="col-span-full text-xs text-slate-400 py-4 text-center">No shifts scheduled for this period.</div>
+            <div className="col-span-full text-xs text-zinc-500 py-4 text-center">No shifts scheduled for this period.</div>
           ) : (
             shifts.slice(0, 6).map(s => (
-              <div key={s.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex justify-between items-center">
+              <div key={s.id} className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex justify-between items-center">
                 <div>
-                  <div className="font-bold text-slate-900 text-sm">{s.staffName}</div>
-                  <div className="text-xs text-sky-600 font-semibold mt-0.5">{s.role}</div>
-                  <div className="text-xs text-slate-400 mt-1">{s.date} ({s.startTime} - {s.endTime})</div>
+                  <div className="font-bold text-white text-sm">{s.staffName}</div>
+                  <div className="text-xs text-lime-400 font-bold mt-0.5">{s.role}</div>
+                  <div className="text-xs text-zinc-400 mt-1">{s.date} ({s.startTime} - {s.endTime})</div>
                 </div>
-                <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">
+                <span className="text-[10px] font-black text-lime-400 bg-lime-400/10 px-2.5 py-1 rounded-full border border-lime-400/30">
                   {s.status}
                 </span>
               </div>

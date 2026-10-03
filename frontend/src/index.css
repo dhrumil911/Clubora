@@ -2,6 +2,335 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Custom Variables for Theme Tokenization */
+:root,
+html.dark,
+body.dark {
+  --background: #09090b;
+  --foreground: #ffffff;
+  --card: #18181b;
+  --card-foreground: #ffffff;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --border: #27272a;
+  --accent: #a3e635; /* lime-400 */
+  --accent-foreground: #09090b;
+  color-scheme: dark;
+}
+
+html.light,
+body.light {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --border: #e2e8f0;
+  --accent: #84cc16; /* lime-500 */
+  --accent-foreground: #ffffff;
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  width: 100%;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark,
+html.dark body,
+html.dark #root {
+  background-color: #09090b;
+  color: #ffffff;
+}
+
+html.light,
+html.light body,
+html.light #root {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
 body {
+  min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ==========================================================================
+   LIGHT MODE OVERRIDES — ALL OVER THE WEBSITE
+   Ensures ZERO black cards, dark gradients, or unreadable dark elements remain
+   ========================================================================== */
+
+/* Page & Section Layouts */
+html.light main,
+html.light section,
+html.light div.bg-zinc-950,
+html.light div.bg-zinc-950\/95,
+html.light div.bg-zinc-950\/90,
+html.light div.bg-zinc-950\/80,
+html.light div.bg-zinc-950\/50,
+html.light header.bg-zinc-950\/95 {
+  background-color: #f8fafc !important;
+}
+
+html.light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Footer Light Mode Styling */
+html.light footer,
+html.light footer.bg-zinc-950,
+html.light footer.bg-black {
+  background-color: #ffffff !important;
+  border-top-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+html.light footer a,
+html.light footer span,
+html.light footer div {
+  color: #0f172a !important;
+}
+
+html.light footer a:hover {
+  color: #84cc16 !important;
+}
+
+/* Master Catch-all for dark fill elements in Light Mode */
+html.light span.bg-zinc-950,
+html.light span.bg-black,
+html.light p.bg-zinc-950,
+html.light p.bg-black,
+html.light div.bg-zinc-950,
+html.light div.bg-black,
+html.light td.bg-zinc-950,
+html.light th.bg-zinc-950,
+html.light tr.bg-zinc-950,
+html.light tfoot.bg-zinc-950,
+html.light tr.bg-black,
+html.light tfoot.bg-black {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Cards, Modals, Dropdowns & Elevated Containers */
+html.light .bg-zinc-900,
+html.light .bg-zinc-900\/95,
+html.light .bg-zinc-900\/90,
+html.light .bg-zinc-900\/80,
+html.light .bg-zinc-900\/60,
+html.light .bg-zinc-900\/50,
+html.light .bg-zinc-900\/40,
+html.light .bg-zinc-900\/30,
+html.light .bg-zinc-900\/20,
+html.light .bg-zinc-950\/60,
+html.light .bg-black,
+html.light .bg-black\/95,
+html.light .bg-black\/90,
+html.light .bg-black\/80,
+html.light .bg-black\/70,
+html.light .bg-black\/60,
+html.light .bg-black\/50,
+html.light .bg-black\/40 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Gradient Background Overrides for Light Mode (Fixes Membership Cards & Tier Overview) */
+html.light .bg-gradient-to-b,
+html.light .bg-gradient-to-tr,
+html.light .bg-gradient-to-r,
+html.light .bg-gradient-to-tl,
+html.light .bg-gradient-to-br {
+  background-image: none !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Sub-cards, Hover States, Table Headers & Secondary Containers */
+html.light .bg-zinc-800,
+html.light .bg-zinc-800\/90,
+html.light .bg-zinc-800\/80,
+html.light .bg-zinc-800\/60,
+html.light .bg-zinc-800\/50,
+html.light .bg-zinc-800\/40,
+html.light .bg-zinc-800\/30,
+html.light .bg-zinc-950\/40 {
+  background-color: #f1f5f9 !important;
+}
+
+html.light .hover\:bg-zinc-800:hover,
+html.light .hover\:bg-zinc-800\/80:hover,
+html.light .hover\:bg-zinc-800\/50:hover,
+html.light .hover\:bg-zinc-900:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Border Color Mappings */
+html.light .border-zinc-800,
+html.light .border-zinc-800\/80,
+html.light .border-zinc-800\/60,
+html.light .border-zinc-800\/50,
+html.light .border-zinc-800\/40,
+html.light .border-zinc-800\/30,
+html.light .border-zinc-700,
+html.light .border-zinc-700\/80,
+html.light .border-zinc-700\/50,
+html.light .border-zinc-700\/40,
+html.light .border-zinc-900 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text Colors in Light Mode */
+html.light .text-white,
+html.light .text-zinc-100,
+html.light .text-zinc-200 {
+  color: #0f172a !important;
+}
+
+html.light .text-zinc-300,
+html.light .text-zinc-400 {
+  color: #475569 !important;
+}
+
+html.light .text-zinc-500 {
+  color: #64748b !important;
+}
+
+/* Form Controls (Inputs, Selects, Textareas) in Light Mode */
+html.light input:not([type="checkbox"]):not([type="radio"]),
+html.light select,
+html.light textarea {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Table Specific Adjustments */
+html.light table th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html.light table td {
+  border-bottom-color: #f1f5f9 !important;
+}
+
+/* Modal Backdrops in Light Mode */
+html.light .fixed.inset-0.bg-zinc-950\/80,
+html.light .fixed.inset-0.bg-black\/80,
+html.light .fixed.inset-0.bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.4) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Status Badges in Light Mode */
+html.light .bg-emerald-950\/40,
+html.light .bg-emerald-900\/40,
+html.light .bg-emerald-900\/30 {
+  background-color: #ecfdf5 !important;
+  color: #065f46 !important;
+  border-color: #a7f3d0 !important;
+}
+
+html.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+html.light .bg-rose-950\/40,
+html.light .bg-rose-900\/40,
+html.light .bg-rose-900\/30 {
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+  border-color: #fecaca !important;
+}
+
+html.light .text-rose-300,
+html.light .text-rose-400 {
+  color: #dc2626 !important;
+}
+
+html.light .bg-amber-950\/40,
+html.light .bg-amber-900\/40,
+html.light .bg-amber-900\/30 {
+  background-color: #fffbeb !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
+
+html.light .text-amber-400 {
+  color: #d97706 !important;
+}
+
+html.light .bg-sky-950\/40,
+html.light .bg-sky-900\/40,
+html.light .bg-sky-900\/30 {
+  background-color: #f0f9ff !important;
+  color: #075985 !important;
+  border-color: #bae6fd !important;
+}
+
+html.light .text-sky-400 {
+  color: #0284c7 !important;
+}
+
+/* Button & Brand Customizations */
+html.light .bg-lime-400 {
+  background-color: #84cc16 !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-lime-400\/10 {
+  background-color: rgba(132, 204, 22, 0.15) !important;
+}
+
+html.light .border-lime-400\/30 {
+  border-color: rgba(132, 204, 22, 0.4) !important;
+}
+
+/* Category Filter Buttons in Light Mode (e.g. ALL, BEVERAGE, MEAL, SNACK) */
+html.light button.bg-zinc-900,
+html.light button.bg-zinc-800 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light button.bg-zinc-900:hover,
+html.light button.bg-zinc-800:hover {
+  background-color: #e2e8f0 !important;
+}
+
+/* Responsive Table & Modal Scroll Wrappers */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-responsive {
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
 }

@@ -97,24 +97,24 @@ export default function MemberBarCafeOrdering({ user, memberInfo }) {
     : menuItems.filter(i => i.category === selectedCategory);
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-6">
+    <div className="bg-zinc-900 rounded-3xl border border-zinc-800 p-6 shadow-2xl space-y-6 text-white">
       
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <div className="flex items-center gap-2">
-            <Coffee className="w-5 h-5 text-amber-500" />
-            <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Cafeteria & Bar Menu</span>
+            <Coffee className="w-5 h-5 text-lime-400" />
+            <span className="text-xs font-bold text-lime-400 uppercase tracking-wider">Cafeteria & Bar Menu</span>
           </div>
-          <h2 className="text-xl font-extrabold text-slate-900 mt-1">Sofa & Patio Food & Drink Ordering</h2>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <h2 className="text-2xl font-black text-white mt-1">Sofa & Patio Food & Drink Ordering</h2>
+          <p className="text-xs text-zinc-400 mt-1 font-medium">
             Order fresh protein shakes, coffee, artisanal snacks & craft beers directly to your sofa or court.
           </p>
         </div>
 
         {/* Member Discount Badge */}
-        <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 px-4 py-2 rounded-2xl font-extrabold text-xs shadow-md shadow-amber-500/20 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 fill-slate-950" />
+        <div className="bg-lime-400 text-zinc-950 px-5 py-2.5 rounded-2xl font-black text-xs shadow-lg shadow-lime-400/20 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 fill-zinc-950" />
           <span>{memberInfo?.tier?.name || 'Gold'} Member Special: {barDiscountPercent}% OFF</span>
         </div>
       </div>
@@ -123,35 +123,35 @@ export default function MemberBarCafeOrdering({ user, memberInfo }) {
       {feedback.msg && (
         <div className={`p-4 rounded-2xl border text-xs font-semibold flex items-center justify-between animate-in fade-in ${
           feedback.type === 'error' 
-            ? 'bg-rose-50 border-rose-200 text-rose-700' 
-            : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+            ? 'bg-rose-950/80 border-rose-800 text-rose-200' 
+            : 'bg-lime-400/10 border-lime-400/20 text-lime-300'
         }`}>
-          <div className="flex items-center gap-2">
-            {feedback.type === 'error' ? <AlertCircle className="w-4 h-4 text-rose-500" /> : <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+          <div className="flex items-center gap-2.5">
+            {feedback.type === 'error' ? <AlertCircle className="w-4 h-4 text-rose-400" /> : <CheckCircle2 className="w-4 h-4 text-lime-400" />}
             <span>{feedback.msg}</span>
           </div>
-          <button onClick={() => setFeedback({ type: '', msg: '' })} className="text-slate-400 hover:text-slate-700">✕</button>
+          <button onClick={() => setFeedback({ type: '', msg: '' })} className="text-zinc-400 hover:text-white">✕</button>
         </div>
       )}
 
       {/* Active Member Tabs Notification */}
       {activeTabs.length > 0 && (
-        <div className="bg-slate-900 text-white p-4 rounded-2xl border border-slate-800 space-y-3">
+        <div className="bg-zinc-800/60 text-white p-5 rounded-2xl border border-zinc-800 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" /> Your Active Open Bar Tabs ({activeTabs.length})
+            <span className="text-xs font-bold text-lime-400 uppercase tracking-wider flex items-center gap-2">
+              <Clock className="w-4 h-4" /> Your Active Open Bar Tabs ({activeTabs.length})
             </span>
-            <span className="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded-full font-bold">Running Tab</span>
+            <span className="text-[10px] bg-lime-400/20 text-lime-300 px-2.5 py-0.5 rounded-full font-black border border-lime-400/30">Running Tab</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {activeTabs.map(tab => (
-              <div key={tab.id} className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs space-y-1.5">
+              <div key={tab.id} className="bg-zinc-900 p-4 rounded-xl border border-zinc-800 text-xs space-y-1.5">
                 <div className="flex justify-between items-center font-bold">
                   <span className="text-white">{tab.tabNumber} ({tab.tableNumber})</span>
-                  <span className="text-emerald-400 font-mono">${tab.finalAmount.toFixed(2)}</span>
+                  <span className="text-lime-400 font-mono font-black text-sm">${tab.finalAmount.toFixed(2)}</span>
                 </div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-[11px] text-zinc-400 font-medium">
                   {tab.items?.map(i => `${i.quantity}x ${i.barItem?.name}`).join(', ')}
                 </div>
               </div>
@@ -164,17 +164,17 @@ export default function MemberBarCafeOrdering({ user, memberInfo }) {
       <div className="space-y-4">
         
         {/* Category Filter Pills */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-zinc-800">
           <div className="flex flex-wrap gap-2">
             {categories.map(cat => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${
+                className={`px-4 py-2 rounded-xl text-xs font-black transition ${
                   selectedCategory === cat
-                    ? 'bg-slate-900 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-lime-400 text-zinc-950 shadow-md shadow-lime-400/20'
+                    : 'bg-zinc-800/80 text-zinc-300 border border-zinc-700/60 hover:text-white'
                 }`}
               >
                 {cat}
@@ -182,15 +182,15 @@ export default function MemberBarCafeOrdering({ user, memberInfo }) {
             ))}
           </div>
 
-          <span className="text-xs text-slate-400 font-medium">
+          <span className="text-xs text-zinc-400 font-medium">
             Showing {filteredItems.length} menu items
           </span>
         </div>
 
         {/* Menu Items Grid */}
         {loading ? (
-          <div className="py-12 text-center text-xs text-slate-400">
-            <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+          <div className="py-12 text-center text-xs text-zinc-400">
+            <div className="w-6 h-6 border-2 border-lime-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
             Loading Menu Items...
           </div>
         ) : (
@@ -200,29 +200,29 @@ export default function MemberBarCafeOrdering({ user, memberInfo }) {
               return (
                 <div
                   key={item.id}
-                  className="bg-slate-50 p-5 rounded-2xl border border-slate-200 hover:border-amber-400 transition flex flex-col justify-between space-y-3"
+                  className="bg-zinc-800/60 p-5 rounded-2xl border border-zinc-800 hover:border-lime-400/60 transition flex flex-col justify-between space-y-3 group"
                 >
                   <div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded-full uppercase">
+                      <span className="text-[10px] font-black text-lime-400 bg-lime-400/10 px-2.5 py-0.5 rounded-full uppercase border border-lime-400/20">
                         {item.category}
                       </span>
-                      <span className="text-[10px] font-extrabold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-extrabold text-lime-400 bg-lime-400/10 px-2.5 py-0.5 rounded-full border border-lime-400/20">
                         {barDiscountPercent}% OFF Member Rate
                       </span>
                     </div>
-                    <h4 className="font-bold text-slate-900 text-base mt-2">{item.name}</h4>
+                    <h4 className="font-bold text-white text-base mt-2.5">{item.name}</h4>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between">
+                  <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-slate-400 line-through mr-2">${item.price.toFixed(2)}</span>
-                      <span className="font-extrabold text-slate-900 text-lg text-emerald-600">
+                      <span className="text-xs text-zinc-500 line-through mr-2 font-mono">${item.price.toFixed(2)}</span>
+                      <span className="font-black text-lime-400 text-lg">
                         ${discountedPrice.toFixed(2)}
                       </span>
                     </div>
 
-                    <span className="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">
+                    <span className="text-xs font-bold text-zinc-300 bg-zinc-900 px-3 py-1 rounded-xl border border-zinc-800">
                       Available at Bar
                     </span>
                   </div>

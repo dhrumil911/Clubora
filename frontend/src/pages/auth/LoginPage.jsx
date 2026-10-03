@@ -144,16 +144,16 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
   const ActiveIcon = activeConfig.icon;
 
   return (
-    <div className="min-h-[88vh] flex items-center justify-center py-12 px-4 bg-slate-950 text-slate-100">
-      <div className="max-w-md w-full space-y-6 bg-slate-900/90 p-8 rounded-3xl border border-slate-800 shadow-2xl backdrop-blur-xl">
+    <div className="w-full flex-1 flex items-center justify-center py-12 px-4 bg-zinc-950 text-zinc-100">
+      <div className="max-w-md w-full space-y-6 bg-zinc-900/90 p-8 rounded-3xl border border-zinc-800 shadow-2xl backdrop-blur-xl">
         
         {/* Role Selector Tabs (if not forced by dedicated path) */}
         {!initialRole && (
           <div className="space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider text-center">
+            <div className="text-[10px] font-black text-zinc-400 uppercase tracking-wider text-center">
               Select Access Portal
             </div>
-            <div className="grid grid-cols-4 gap-1.5 p-1.5 bg-slate-950 rounded-2xl border border-slate-850">
+            <div className="grid grid-cols-3 gap-1.5 p-1.5 bg-zinc-950 rounded-2xl border border-zinc-800">
               {ROLES_CONFIG.map((r) => {
                 const IconComponent = r.icon;
                 const isSelected = activeRoleKey === r.key;
@@ -162,14 +162,14 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
                     key={r.key}
                     type="button"
                     onClick={() => handleRoleSelect(r.key)}
-                    className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl text-[11px] font-bold transition-all ${
+                    className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl text-[10px] font-bold transition-all ${
                       isSelected
-                        ? 'bg-slate-800 text-white shadow-md border border-slate-700'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                        ? 'bg-zinc-800 text-lime-400 shadow-md border border-lime-400/30'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
                     }`}
                   >
-                    <IconComponent className={`w-4 h-4 mb-1 ${isSelected ? 'text-sky-400' : 'text-slate-500'}`} />
-                    <span className="truncate max-w-full">{r.label.split(' ')[0]}</span>
+                    <IconComponent className={`w-3.5 h-3.5 mb-1 ${isSelected ? 'text-lime-400' : 'text-zinc-500'}`} />
+                    <span className="truncate max-w-full">{r.label}</span>
                   </button>
                 );
               })}
@@ -179,15 +179,15 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
 
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${activeConfig.color} mx-auto flex items-center justify-center text-white shadow-lg shadow-sky-500/10`}>
+          <div className="w-14 h-14 rounded-2xl bg-lime-400 text-zinc-950 mx-auto flex items-center justify-center shadow-lg shadow-lime-400/20 font-black">
             <ActiveIcon className="w-7 h-7" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-extrabold text-white">
+            <h2 className="text-2xl font-black text-white">
               {customTitle || `${activeConfig.label} Login`}
             </h2>
-            <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+            <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto font-medium">
               {customSubtitle || activeConfig.subtitle}
             </p>
           </div>
@@ -202,12 +202,12 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
         )}
 
         {/* Quick Demo Credentials Banner */}
-        <div className="bg-slate-950/80 border border-slate-800 p-3 rounded-2xl flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
+        <div className="bg-zinc-950/90 border border-zinc-800 p-3.5 rounded-2xl flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2.5">
+            <Sparkles className="w-4 h-4 text-lime-400" />
             <div className="text-left">
-              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">Quick Demo Account</span>
-              <span className="text-slate-300 font-mono text-[11px]">{activeConfig.demo.email}</span>
+              <span className="text-[10px] font-black text-lime-400 uppercase tracking-wider block">Quick Demo Account</span>
+              <span className="text-zinc-300 font-mono text-[11px]">{activeConfig.demo.email}</span>
             </div>
           </div>
           <button
@@ -216,7 +216,7 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
               setEmail(activeConfig.demo.email);
               setPassword(activeConfig.demo.password);
             }}
-            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold rounded-lg transition border border-slate-700"
+            className="px-3 py-1.5 bg-lime-400/10 hover:bg-lime-400/20 text-lime-400 text-[11px] font-black rounded-xl transition border border-lime-400/30"
           >
             Auto Fill
           </button>
@@ -226,39 +226,39 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
         <form onSubmit={handleLogin} className="space-y-4">
           
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+            <label className="block text-xs font-bold text-zinc-300 mb-1.5">Email Address</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
               <input
                 type="email"
                 required
                 placeholder="user@clubora.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-sky-500 focus:outline-none transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:ring-2 focus:ring-lime-400 focus:border-transparent focus:outline-none transition"
               />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-xs font-semibold text-slate-300">Password</label>
-              <span className="text-[11px] text-slate-500">Demo: <code className="text-slate-400">{activeConfig.demo.password}</code></span>
+              <label className="block text-xs font-bold text-zinc-300">Password</label>
+              <span className="text-[11px] text-zinc-500">Demo: <code className="text-lime-400 font-mono">{activeConfig.demo.password}</code></span>
             </div>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:ring-2 focus:ring-sky-500 focus:outline-none transition"
+                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-white placeholder-zinc-600 focus:ring-2 focus:ring-lime-400 focus:border-transparent focus:outline-none transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300"
+                className="absolute right-3.5 top-3 text-zinc-500 hover:text-zinc-300"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -268,11 +268,11 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 bg-gradient-to-r ${activeConfig.color} hover:opacity-95 text-white font-bold rounded-xl text-sm shadow-lg shadow-sky-600/20 transition flex items-center justify-center gap-2`}
+            className="w-full py-3 bg-lime-400 hover:bg-lime-300 text-zinc-950 font-black rounded-xl text-sm shadow-lg shadow-lime-400/20 transition flex items-center justify-center gap-2"
           >
             {loading ? (
               <span className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></div>
                 Authenticating...
               </span>
             ) : (
@@ -286,9 +286,9 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
         </form>
 
         {/* Member Sign Up Redirect */}
-        <div className="text-center text-xs text-slate-400 pt-4 border-t border-slate-800/80 flex justify-between items-center">
+        <div className="text-center text-xs text-zinc-400 pt-4 border-t border-zinc-800/80 flex justify-between items-center">
           <span>Need a new Member account?</span>
-          <Link to="/auth/member/signup" className="text-sky-400 hover:text-sky-300 font-bold transition flex items-center gap-1">
+          <Link to="/auth/member/signup" className="text-lime-400 hover:text-lime-300 font-bold transition flex items-center gap-1">
             <span>Register Here</span>
             <ArrowRight className="w-3 h-3" />
           </Link>

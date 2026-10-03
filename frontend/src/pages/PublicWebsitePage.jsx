@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Globe, Trophy, ShieldCheck, Calendar, ShoppingBag, Send, CheckCircle2, Star, Zap } from 'lucide-react';
+import { Globe, Trophy, ShieldCheck, Calendar, ShoppingBag, Send, CheckCircle2, Star, Zap, Crown, Shield } from 'lucide-react';
 
 export default function PublicWebsitePage() {
   const [tiers, setTiers] = useState([]);
+  const [selectedPlanName, setSelectedPlanName] = useState('Gold');
   const [courts, setCourts] = useState([]);
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ name: '', phone: '', email: '', interest: 'Membership Enquiry', notes: '' });
@@ -65,36 +66,190 @@ export default function PublicWebsitePage() {
       </div>
 
       {/* Membership Tiers Section */}
-      <div id="plans" className="py-16 bg-slate-950 border-y border-slate-800">
+      <div id="plans" className="py-16 bg-zinc-950 border-y border-zinc-800">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold">Membership Tier Plans</h2>
-            <p className="text-slate-400 text-sm mt-1">Unlock court discounts, gear shop offers, and post-match bar perks.</p>
+            <h2 className="text-2xl sm:text-3xl font-black text-white">Membership Tier Plans</h2>
+            <p className="text-zinc-400 text-sm mt-1">Unlock court discounts, gear shop offers, and post-match bar perks.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {tiers.map(t => (
-              <div key={t.id} className="bg-slate-900 p-8 rounded-3xl border border-slate-800 flex flex-col justify-between hover:border-sky-500 transition">
-                <div>
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-white">{t.name}</h3>
-                    {t.name === 'Gold' && <span className="bg-amber-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded-full">POPULAR</span>}
-                  </div>
-                  <div className="text-3xl font-extrabold text-sky-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-slate-400">/mo</span></div>
-                  <p className="text-xs text-slate-400 mt-2">{t.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            {tiers.map(t => {
+              const isSelected = selectedPlanName === t.name;
 
-                  <div className="mt-6 space-y-2 text-xs text-slate-300">
-                    <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Court Discount: <strong>{t.courtDiscountPercent}% OFF</strong></div>
-                    <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Shop Discount: <strong>{t.shopDiscountPercent}% OFF</strong></div>
-                    <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400" /> Bar & Cafeteria: <strong>{t.barDiscountPercent}% OFF</strong></div>
+              if (t.name === 'Gold') {
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => setSelectedPlanName(t.name)}
+                    className={`bg-gradient-to-b from-amber-950/40 via-zinc-900 to-zinc-900 p-8 rounded-3xl border-2 flex flex-col justify-between transition-all duration-300 shadow-2xl relative cursor-pointer ${
+                      isSelected
+                        ? 'border-amber-400 ring-4 ring-amber-400/30 scale-[1.02]'
+                        : 'border-amber-500/50 hover:border-amber-400'
+                    }`}
+                  >
+                    <div>
+                      {isSelected && (
+                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber-400 text-zinc-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-amber-400/30">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> SELECTED PLAN
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-2">
+                          <Crown className="w-5 h-5 text-amber-400" />
+                          <h3 className="text-2xl font-black text-white">{t.name} Tier</h3>
+                        </div>
+                        <span className="bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 font-black text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md shadow-amber-400/20">
+                          FLAGSHIP
+                        </span>
+                      </div>
+
+                      <div className="text-4xl font-black text-amber-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <p className="text-xs text-zinc-300 mt-2 font-medium">{t.description || 'All-access flagship membership with free court sessions and top discounts.'}</p>
+
+                      <div className="mt-6 space-y-3 text-xs text-zinc-200 border-t border-amber-500/20 pt-4">
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" /> Court Bookings: <strong className="text-white">{t.courtDiscountPercent}% OFF (Free Courts)</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" /> Gear Shop Discount: <strong className="text-white">{t.shopDiscountPercent}% OFF</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" /> Bar & Cafeteria: <strong className="text-white">{t.barDiscountPercent}% OFF</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" /> Priority Peak-Hour Reservation</div>
+                      </div>
+                    </div>
+
+                    <a
+                      href="#trial"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPlanName(t.name);
+                        setForm(f => ({ ...f, interest: `${t.name} Membership` }));
+                      }}
+                      className={`mt-8 block text-center py-3.5 font-black rounded-xl text-xs transition shadow-lg ${
+                        isSelected
+                          ? 'bg-amber-400 hover:bg-amber-300 text-zinc-950 shadow-amber-400/30'
+                          : 'bg-amber-500/20 hover:bg-amber-400 hover:text-zinc-950 text-amber-300 border border-amber-400/30'
+                      }`}
+                    >
+                      {isSelected ? '✓ Gold Plan Selected — Apply Now' : 'Select Gold Plan'}
+                    </a>
                   </div>
+                );
+              }
+
+              if (t.name === 'Silver') {
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => setSelectedPlanName(t.name)}
+                    className={`bg-gradient-to-b from-zinc-800/40 via-zinc-900 to-zinc-900 p-8 rounded-3xl border flex flex-col justify-between transition-all duration-300 shadow-xl relative cursor-pointer ${
+                      isSelected
+                        ? 'border-zinc-200 ring-4 ring-zinc-300/30 scale-[1.02]'
+                        : 'border-zinc-700/80 hover:border-zinc-400'
+                    }`}
+                  >
+                    <div>
+                      {isSelected && (
+                        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-zinc-200 text-zinc-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-zinc-200/30">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> SELECTED PLAN
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-center mb-3">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-5 h-5 text-zinc-300" />
+                          <h3 className="text-2xl font-black text-white">{t.name} Tier</h3>
+                        </div>
+                        <span className="bg-zinc-800 text-zinc-300 border border-zinc-700 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                          VALUE CHOICE
+                        </span>
+                      </div>
+
+                      <div className="text-4xl font-black text-zinc-200 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Standard membership with 50% court discount and gear perks.'}</p>
+
+                      <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-zinc-800 pt-4">
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-zinc-300 flex-shrink-0" /> Court Bookings: <strong className="text-white">{t.courtDiscountPercent}% OFF</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-zinc-300 flex-shrink-0" /> Gear Shop Discount: <strong className="text-white">{t.shopDiscountPercent}% OFF</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-zinc-300 flex-shrink-0" /> Bar & Cafeteria: <strong className="text-white">{t.barDiscountPercent}% OFF</strong></div>
+                        <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-zinc-300 flex-shrink-0" /> Flexible Session Scheduling</div>
+                      </div>
+                    </div>
+
+                    <a
+                      href="#trial"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPlanName(t.name);
+                        setForm(f => ({ ...f, interest: `${t.name} Membership` }));
+                      }}
+                      className={`mt-8 block text-center py-3.5 font-black rounded-xl text-xs transition shadow-md ${
+                        isSelected
+                          ? 'bg-zinc-200 hover:bg-white text-zinc-950 shadow-zinc-200/30'
+                          : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700'
+                      }`}
+                    >
+                      {isSelected ? '✓ Silver Plan Selected — Apply Now' : 'Select Silver Plan'}
+                    </a>
+                  </div>
+                );
+              }
+
+              // Junior Tier
+              return (
+                <div
+                  key={t.id}
+                  onClick={() => setSelectedPlanName(t.name)}
+                  className={`bg-gradient-to-b from-sky-950/20 via-zinc-900 to-zinc-900 p-8 rounded-3xl border flex flex-col justify-between transition-all duration-300 shadow-xl relative cursor-pointer ${
+                    isSelected
+                      ? 'border-sky-400 ring-4 ring-sky-400/30 scale-[1.02]'
+                      : 'border-sky-500/40 hover:border-sky-400'
+                  }`}
+                >
+                  <div>
+                    {isSelected && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sky-400 text-zinc-950 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-sky-400/30">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> SELECTED PLAN
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="w-5 h-5 text-sky-400" />
+                        <h3 className="text-2xl font-black text-white">{t.name} Tier</h3>
+                      </div>
+                      <span className="bg-sky-500/10 text-sky-400 border border-sky-500/30 font-extrabold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        UNDER-18 ATHLETE
+                      </span>
+                    </div>
+
+                    <div className="text-4xl font-black text-sky-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                    <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Youth & junior membership (under-18) for developing young athletes.'}</p>
+
+                    <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-sky-500/20 pt-4">
+                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" /> Court Bookings: <strong className="text-white">{t.courtDiscountPercent}% OFF (Junior Rate)</strong></div>
+                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" /> Shop Discount: <strong className="text-white">{t.shopDiscountPercent}% OFF Junior Gear</strong></div>
+                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" /> Bar & Cafeteria: <strong className="text-white">{t.barDiscountPercent}% OFF Healthy Snacks</strong></div>
+                      <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-sky-400 flex-shrink-0" /> Academy & Coaching Access</div>
+                    </div>
+                  </div>
+
+                  <a
+                    href="#trial"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPlanName(t.name);
+                      setForm(f => ({ ...f, interest: `${t.name} Membership` }));
+                    }}
+                    className={`mt-8 block text-center py-3.5 font-black rounded-xl text-xs transition shadow-md ${
+                      isSelected
+                        ? 'bg-sky-400 hover:bg-sky-300 text-zinc-950 shadow-sky-400/30'
+                        : 'bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 hover:text-white border border-sky-500/30'
+                    }`}
+                  >
+                    {isSelected ? '✓ Junior Plan Selected — Apply Now' : 'Select Junior Plan'}
+                  </a>
                 </div>
-
-                <a href="#trial" className="mt-8 block text-center py-2.5 bg-slate-800 hover:bg-sky-600 text-white font-bold rounded-xl text-xs transition">
-                  Select {t.name} Plan
-                </a>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

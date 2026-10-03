@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import api from './api';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Public & Auth Pages
 import PublicLandingPage from './pages/PublicLandingPage';
@@ -61,21 +62,22 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center w-full">
         <div className="text-center space-y-3">
-          <div className="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-xs text-slate-400 font-semibold">Loading Clubora Platform...</p>
+          <div className="w-10 h-10 border-4 border-lime-400 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-xs text-zinc-400 font-semibold">Loading Clubora Platform...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <ThemeProvider>
+      <BrowserRouter>
+        <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans w-full">
         <Navbar user={user} onLogout={handleLogout} />
         
-        <main className="flex-1">
+        <main className="flex-1 bg-zinc-950 text-white w-full flex flex-col">
           <Routes>
             {/* Task 1: Public Landing Page */}
             <Route path="/" element={<PublicLandingPage user={user} />} />
@@ -297,6 +299,7 @@ export default function App() {
           </Routes>
         </main>
       </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

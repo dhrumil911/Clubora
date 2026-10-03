@@ -27,46 +27,46 @@ export default function MemberDashboardPage({ user }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8 bg-zinc-950 min-h-screen text-zinc-100">
       
       {/* Member Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white p-8 rounded-3xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-sky-600/30 border border-sky-400/30 text-sky-300 font-extrabold text-2xl flex items-center justify-center shadow-inner">
+      <div className="bg-zinc-900 text-zinc-100 p-4 sm:p-6 lg:p-8 rounded-3xl border border-zinc-800 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-lime-400 text-zinc-950 font-black text-xl sm:text-2xl flex items-center justify-center shadow-lg shadow-lime-400/20 flex-shrink-0">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'M'}
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-sky-400 bg-sky-950 px-2 py-0.5 rounded border border-sky-800">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-mono font-bold text-lime-400 bg-zinc-950 px-2.5 py-0.5 rounded border border-lime-400/30">
                 {memberInfo?.memberCode || 'MEM-001'}
               </span>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+              <span className="text-[10px] font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800">
                 ACTIVE MEMBER
               </span>
             </div>
-            <h1 className="text-3xl font-extrabold text-white mt-1">Welcome back, {user?.name}!</h1>
-            <p className="text-slate-400 text-xs mt-0.5">Champions Club Member Portal</p>
+            <h1 className="text-xl sm:text-3xl font-black text-white mt-1">Welcome back, {user?.name}!</h1>
+            <p className="text-zinc-400 text-xs mt-0.5 font-medium">Champions Club OS Member Portal</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 w-full sm:w-auto">
           <Link
             to="/bookings"
-            className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-sky-600/20 transition flex items-center gap-2"
+            className="px-5 py-2.5 bg-lime-400 hover:bg-lime-300 text-zinc-950 font-black rounded-xl text-xs shadow-lg shadow-lime-400/20 transition flex items-center justify-center gap-2 w-full sm:w-auto"
           >
             <Calendar className="w-4 h-4" /> Book a Court
           </Link>
           <a
             href="#bar-cafe-section"
-            className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition flex items-center gap-2"
+            className="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold rounded-xl text-xs border border-zinc-700 transition flex items-center justify-center gap-2 w-full sm:w-auto"
           >
-            <Coffee className="w-4 h-4 fill-slate-950" /> Order Bar & Cafe
+            <Coffee className="w-4 h-4 fill-amber-400" /> Order Bar & Cafe
           </a>
           <Link
             to="/shop"
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-2"
+            className="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold rounded-xl text-xs border border-zinc-700 transition flex items-center justify-center gap-2 w-full sm:w-auto"
           >
-            <ShoppingBag className="w-4 h-4" /> Order Gear Online
+            <ShoppingBag className="w-4 h-4 text-purple-400" /> Order Gear Online
           </Link>
         </div>
       </div>
@@ -75,59 +75,59 @@ export default function MemberDashboardPage({ user }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Tier Benefits */}
-        <div className="lg:col-span-1 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex justify-between items-start pb-4 border-b border-slate-100">
+        <div className="lg:col-span-1 bg-zinc-900/90 p-6 rounded-3xl border border-zinc-800 shadow-xl">
+          <div className="flex justify-between items-start pb-4 border-b border-zinc-800">
             <div>
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Your Plan</span>
-              <h3 className="text-xl font-extrabold text-slate-900 mt-0.5">{memberInfo?.tier?.name || 'Gold Tier'}</h3>
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Your Plan</span>
+              <h3 className="text-xl font-black text-white mt-0.5">{memberInfo?.tier?.name || 'Gold Tier'}</h3>
             </div>
-            <span className="bg-amber-100 text-amber-800 font-bold px-3 py-1 rounded-full text-xs flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" /> Premium Member
+            <span className="bg-lime-400/10 text-lime-400 border border-lime-400/30 font-black px-3 py-1 rounded-full text-xs flex items-center gap-1">
+              <Star className="w-3.5 h-3.5 fill-lime-400 text-lime-400" /> Premium Member
             </span>
           </div>
 
-          <div className="py-4 space-y-3 text-xs text-slate-700">
+          <div className="py-4 space-y-3 text-xs text-zinc-300">
             <div className="flex items-center gap-2 font-semibold">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> Court Booking Discount: <strong>{memberInfo?.tier?.courtDiscountPercent || 100}% OFF</strong>
+              <CheckCircle className="w-4 h-4 text-lime-400" /> Court Booking Discount: <strong>{memberInfo?.tier?.courtDiscountPercent || 100}% OFF</strong>
             </div>
             <div className="flex items-center gap-2 font-semibold">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> Gear Shop Discount: <strong>{memberInfo?.tier?.shopDiscountPercent || 20}% OFF</strong>
+              <CheckCircle className="w-4 h-4 text-lime-400" /> Gear Shop Discount: <strong>{memberInfo?.tier?.shopDiscountPercent || 20}% OFF</strong>
             </div>
             <div className="flex items-center gap-2 font-semibold">
-              <CheckCircle className="w-4 h-4 text-emerald-500" /> Bar & Cafeteria Discount: <strong>{memberInfo?.tier?.barDiscountPercent || 20}% OFF</strong>
+              <CheckCircle className="w-4 h-4 text-lime-400" /> Bar & Cafeteria Discount: <strong>{memberInfo?.tier?.barDiscountPercent || 20}% OFF</strong>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 text-xs text-slate-500">
-            Membership expires on: <strong>{memberInfo?.expiresAt ? new Date(memberInfo.expiresAt).toLocaleDateString() : 'Active (1 Year)'}</strong>
+          <div className="pt-4 border-t border-zinc-800 text-xs text-zinc-400">
+            Membership expires on: <strong className="text-white">{memberInfo?.expiresAt ? new Date(memberInfo.expiresAt).toLocaleDateString() : 'Active (1 Year)'}</strong>
           </div>
         </div>
 
         {/* Quick Launcher & Activity Overview */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-zinc-900/90 p-6 rounded-3xl border border-zinc-800 shadow-xl">
+            <h3 className="text-lg font-black text-white mb-4 pb-3 border-b border-zinc-800 flex items-center justify-between">
               <span>Member Services & Instant Court Access</span>
-              <Calendar className="w-5 h-5 text-sky-600" />
+              <Calendar className="w-5 h-5 text-lime-400" />
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Link to="/bookings" className="p-4 bg-sky-50 rounded-2xl border border-sky-100 hover:border-sky-300 transition group">
-                <div className="text-xs font-bold text-sky-700 uppercase">Court Scheduler</div>
-                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-sky-600">Reserve Courts</div>
-                <div className="text-[11px] text-slate-500 mt-1">1-hour sessions starting every 30m</div>
+              <Link to="/bookings" className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 hover:border-lime-400/60 transition duration-300 group">
+                <div className="text-[10px] font-black text-lime-400 uppercase tracking-wider">Court Scheduler</div>
+                <div className="text-white font-black text-sm mt-1 group-hover:text-lime-400 transition-colors">Reserve Courts</div>
+                <div className="text-[11px] text-zinc-400 mt-1">1-hour sessions starting every 30m</div>
               </Link>
 
-              <a href="#bar-cafe-section" className="p-4 bg-amber-50 rounded-2xl border border-amber-100 hover:border-amber-300 transition group">
-                <div className="text-xs font-bold text-amber-700 uppercase">Cafeteria Bar</div>
-                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-amber-600">Order Food & Drinks</div>
-                <div className="text-[11px] text-slate-500 mt-1">Auto {memberInfo?.tier?.barDiscountPercent || 20}% member discount</div>
+              <a href="#bar-cafe-section" className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 hover:border-amber-400/60 transition duration-300 group">
+                <div className="text-[10px] font-black text-amber-400 uppercase tracking-wider">Cafeteria Bar</div>
+                <div className="text-white font-black text-sm mt-1 group-hover:text-amber-400 transition-colors">Order Food & Drinks</div>
+                <div className="text-[11px] text-zinc-400 mt-1">Auto {memberInfo?.tier?.barDiscountPercent || 20}% member discount</div>
               </a>
 
-              <Link to="/shop" className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-300 transition group">
-                <div className="text-xs font-bold text-indigo-700 uppercase">Gear Pro Shop</div>
-                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-indigo-600">Buy Equipment</div>
-                <div className="text-[11px] text-slate-500 mt-1">Auto {memberInfo?.tier?.shopDiscountPercent || 20}% member discount</div>
+              <Link to="/shop" className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 hover:border-purple-400/60 transition duration-300 group">
+                <div className="text-[10px] font-black text-purple-400 uppercase tracking-wider">Gear Pro Shop</div>
+                <div className="text-white font-black text-sm mt-1 group-hover:text-purple-400 transition-colors">Buy Equipment</div>
+                <div className="text-[11px] text-zinc-400 mt-1">Auto {memberInfo?.tier?.shopDiscountPercent || 20}% member discount</div>
               </Link>
             </div>
           </div>
