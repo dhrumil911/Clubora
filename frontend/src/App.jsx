@@ -78,7 +78,7 @@ export default function App() {
         <main className="flex-1">
           <Routes>
             {/* Task 1: Public Landing Page */}
-            <Route path="/" element={<PublicLandingPage />} />
+            <Route path="/" element={<PublicLandingPage user={user} />} />
 
             {/* Unified Authentication Pages */}
             <Route

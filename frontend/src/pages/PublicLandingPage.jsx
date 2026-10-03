@@ -3,28 +3,20 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { 
   Trophy, ShieldCheck, Calendar, ShoppingBag, Coffee, Users, Target, LayoutDashboard, 
-  CheckCircle2, Star, ArrowRight, Shield, Award, Zap, Phone, Mail, MapPin
+  CheckCircle2, Star, ArrowRight, Shield, Award, Zap, Phone, Mail, MapPin, Clock, Info
 } from 'lucide-react';
 
-export default function PublicLandingPage() {
+export default function PublicLandingPage({ user }) {
   const [tiers, setTiers] = useState([]);
-  const [courts, setCourts] = useState([]);
-  const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetchPublicData();
+    fetchPublicTiers();
   }, []);
 
-  const fetchPublicData = async () => {
+  const fetchPublicTiers = async () => {
     try {
-      const [tiersRes, courtsRes, shopRes] = await Promise.all([
-        api.get('/public/tiers'),
-        api.get('/public/courts'),
-        api.get('/public/shop')
-      ]);
+      const tiersRes = await api.get('/public/tiers');
       setTiers(tiersRes.data.filter(t => t.name !== 'Walk-in'));
-      setCourts(courtsRes.data);
-      setProducts(shopRes.data.slice(0, 4));
     } catch (err) {
       console.error(err);
     }
@@ -58,7 +50,7 @@ export default function PublicLandingPage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
           <Link
-            to="/auth/member/login"
+            to="/bookings"
             className="px-7 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-200 font-extrabold rounded-2xl text-sm border border-slate-700 transition"
           >
             Book a Court
@@ -142,6 +134,62 @@ export default function PublicLandingPage() {
         </div>
       </section>
 
+      {/* About Section */}
+      <section id="about" className="py-16 bg-slate-900 border-t border-slate-800">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 bg-sky-950 text-sky-400 border border-sky-800 px-3 py-1 rounded-full text-xs font-bold">
+                <Info className="w-3.5 h-3.5" /> About Champions Club
+              </div>
+              <h2 className="text-3xl font-extrabold text-white">
+                Built to solve the operational headaches of modern sports clubs.
+              </h2>
+              <p className="text-slate-300 text-sm leading-relaxed">
+                The Champions Club is a thriving multi-sport facility featuring tennis, padel, badminton courts, and cricket nets. Outgrowing WhatsApp messages, paper receipts, and fragmented spreadsheets, Clubora provides a unified platform to manage every scene of club life.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4 pt-2 text-xs">
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                  <div className="text-sky-400 font-extrabold text-xl">3 Tiers</div>
+                  <div className="text-slate-400 mt-0.5">Gold, Silver & Junior Plans</div>
+                </div>
+                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                  <div className="text-indigo-400 font-extrabold text-xl">30 Min</div>
+                  <div className="text-slate-400 mt-0.5">Staggered Slot Opening</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-950 p-8 rounded-3xl border border-slate-800 space-y-4 shadow-xl">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-sky-400" /> Operational Backbone Features
+              </h3>
+              <ul className="space-y-3 text-xs text-slate-300">
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span><strong>Member Recognition:</strong> Automatic tier discounts applied at counter POS & bar tabs.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span><strong>Anti-Double Booking:</strong> Strict conflict resolution algorithm for 1-hour sessions.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span><strong>Unified Gear Inventory:</strong> Counter sales & sofa orders share single shelf stock.</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                  <span><strong>Shift & Tab Settlement:</strong> Fast bar POS supporting Cash, Card, and UPI.</span>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* Membership Plans Section */}
       <section id="membership" className="py-16 bg-slate-950 border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-4">
@@ -180,31 +228,6 @@ export default function PublicLandingPage() {
         </div>
       </section>
 
-      {/* Courts Availability Section */}
-      <section id="courts" className="py-16 max-w-6xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Courts & Facility Availability</h2>
-          <p className="text-slate-400 text-xs sm:text-sm mt-1">Live court rates for Tennis, Cricket Nets, Padel, and Badminton.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {courts.map(c => (
-            <div key={c.id} className="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex justify-between items-center">
-              <div>
-                <h4 className="font-bold text-white text-base">{c.name}</h4>
-                <div className="text-xs text-sky-400 font-semibold">{c.sport}</div>
-              </div>
-              <div className="text-right">
-                <div className="font-extrabold text-white text-lg">${c.hourlyRate}/hr</div>
-                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                  Available
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="py-12 bg-slate-950 border-t border-slate-800 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -218,8 +241,9 @@ export default function PublicLandingPage() {
 
           <div className="flex flex-wrap gap-6 text-slate-400">
             <a href="#membership" className="hover:text-white">Membership</a>
-            <a href="#courts" className="hover:text-white">Courts</a>
-            <a href="#shop" className="hover:text-white">Gear Shop</a>
+            <Link to="/bookings" className="hover:text-white">Courts</Link>
+            <Link to="/shop" className="hover:text-white">Shop</Link>
+            <a href="#about" className="hover:text-white">About</a>
             <Link to="/auth/member/login" className="hover:text-white">Member Login</Link>
             <Link to="/auth/owner/login" className="hover:text-white">Owner Portal</Link>
           </div>
