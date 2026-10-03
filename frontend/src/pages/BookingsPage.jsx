@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../api';
 import { Calendar as CalendarIcon, Clock, AlertTriangle, Plus, Users, Shield, CheckCircle2, X } from 'lucide-react';
 
-export default function BookingsPage() {
+export default function BookingsPage({ user }) {
   const [courts, setCourts] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [members, setMembers] = useState([]);
@@ -23,6 +23,25 @@ export default function BookingsPage() {
   });
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  const loggedInMember = members.find(m =>
+    (user?.email && m.email?.toLowerCase() === user.email?.toLowerCase()) ||
+    (user?.name && m.name?.toLowerCase() === user.name?.toLowerCase()) ||
+    (user?.id && m.id === user.id)
+  );
+
+  const isStaffOrOwner = ['OWNER', 'FRONT_DESK_STAFF', 'FRONT_DESK', 'BAR_SHOP_STAFF', 'SHOP_STAFF', 'BAR_STAFF', 'SHOP', 'BAR'].includes(user?.role);
+  const isMemberRole = user?.role === 'MEMBER' || (loggedInMember && !isStaffOrOwner);
+
+  useEffect(() => {
+    if (isMemberRole && loggedInMember) {
+      setBookingForm(prev => ({
+        ...prev,
+        memberId: loggedInMember.id,
+        customerName: loggedInMember.name
+      }));
+    }
+  }, [loggedInMember, isMemberRole]);
 
   const timeSlots = [
     '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -125,7 +144,7 @@ export default function BookingsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -260,7 +279,7 @@ export default function BookingsPage() {
             )}
 
             <form onSubmit={handleCreateBooking} className="space-y-4">
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Court</label>
@@ -289,7 +308,8 @@ export default function BookingsPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Select Member (for Tier Discount)</label>
                 <select
-                  value={bookingForm.memberId}
+                  value={isMemberRole ? (loggedInMember ? loggedInMember.id : bookingForm.memberId) : bookingForm.memberId}
+                  disabled={isMemberRole}
                   onChange={(e) => {
                     const mId = e.target.value;
                     const m = members.find(mem => mem.id === mId);
@@ -299,14 +319,26 @@ export default function BookingsPage() {
                       customerName: m ? m.name : bookingForm.customerName
                     });
                   }}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 font-medium"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 font-medium disabled:opacity-80 disabled:bg-slate-100 cursor-not-allowed"
                 >
-                  <option value="">Walk-in Customer (Full Rate)</option>
-                  {members.map(m => (
-                    <option key={m.id} value={m.id}>
-                      {m.name} ({m.tier?.name} Tier - {m.tier?.courtDiscountPercent}% off)
-                    </option>
-                  ))}
+                  {isMemberRole ? (
+                    loggedInMember ? (
+                      <option value={loggedInMember.id}>
+                        {loggedInMember.name} ({loggedInMember.tier?.name || 'Member'} Tier - {loggedInMember.tier?.courtDiscountPercent || 0}% off)
+                      </option>
+                    ) : (
+                      <option value="">{user?.name || 'Member'} (Full Rate)</option>
+                    )
+                  ) : (
+                    <>
+                      <option value="">Walk-in Customer (Full Rate)</option>
+                      {members.map(m => (
+                        <option key={m.id} value={m.id}>
+                          {m.name} ({m.tier?.name} Tier - {m.tier?.courtDiscountPercent}% off)
+                        </option>
+                      ))}
+                    </>
+                  )}
                 </select>
               </div>
 
