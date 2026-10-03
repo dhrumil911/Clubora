@@ -124,7 +124,35 @@ export default function App() {
               }
             />
 
-            {/* Task 5: Bar / Shop Staff Login */}
+            {/* Bar Staff Login */}
+            <Route
+              path="/auth/bar/login"
+              element={
+                <LoginPage
+                  role="BAR_STAFF"
+                  title="Bar Staff Login"
+                  subtitle="Access cafeteria bar order tabs & daily bar expenses tracker"
+                  demoCredentials={{ email: 'bar@clubora.com', password: 'Bar@2026' }}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              }
+            />
+
+            {/* Shop Staff Login */}
+            <Route
+              path="/auth/shop/login"
+              element={
+                <LoginPage
+                  role="SHOP_STAFF"
+                  title="Shop Staff Login"
+                  subtitle="Access pro shop gear inventory POS & retail sales"
+                  demoCredentials={{ email: 'shop@clubora.com', password: 'Shop@2026' }}
+                  onLoginSuccess={handleLoginSuccess}
+                />
+              }
+            />
+
+            {/* Bar & Shop Combined Staff Login */}
             <Route
               path="/auth/bar-shop/login"
               element={
@@ -174,7 +202,7 @@ export default function App() {
             <Route
               path="/bar-shop"
               element={
-                <ProtectedRoute user={user} allowedRoles={['BAR_SHOP_STAFF', 'BAR', 'OWNER']}>
+                <ProtectedRoute user={user} allowedRoles={['BAR_SHOP_STAFF', 'BAR_STAFF', 'BAR', 'SHOP_STAFF', 'SHOP', 'OWNER']}>
                   <BarShopDashboardPage user={user} />
                 </ProtectedRoute>
               }
@@ -211,7 +239,7 @@ export default function App() {
             <Route
               path="/shop"
               element={
-                <ProtectedRoute user={user} allowedRoles={['MEMBER', 'BAR_SHOP_STAFF', 'BAR', 'OWNER']}>
+                <ProtectedRoute user={user} allowedRoles={['MEMBER', 'BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER']}>
                   <ShopPage />
                 </ProtectedRoute>
               }
@@ -220,8 +248,8 @@ export default function App() {
             <Route
               path="/bar"
               element={
-                <ProtectedRoute user={user} allowedRoles={['BAR_SHOP_STAFF', 'BAR', 'OWNER']}>
-                  <BarPOSPage />
+                <ProtectedRoute user={user} allowedRoles={['MEMBER', 'BAR_SHOP_STAFF', 'BAR_STAFF', 'BAR', 'OWNER']}>
+                  <BarPOSPage user={user} />
                 </ProtectedRoute>
               }
             />
