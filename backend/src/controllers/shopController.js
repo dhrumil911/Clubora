@@ -110,20 +110,23 @@ export async function checkout(req, res) {
       ]);
 
       const unitPrice = parseFloat(product.price);
-      const itemTotal = unitPrice * cartItem.quantity;
-      subtotal += itemTotal;
+      const itemGrossTotal = unitPrice * cartItem.quantity;
+      subtotal += itemGrossTotal;
+
+      // Net discounted item total recorded for owner financial reports
+      const itemDiscountedTotal = itemGrossTotal * (1 - discountPercent / 100);
 
       const txId = `tx-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       await client.query(`
         INSERT INTO inventory_transactions (id, product_id, type, quantity, unit_price, total_price, channel)
         VALUES ($1, $2, $3, $4, $5, $6, $7)
-      `, [txId, product.id, channel === 'ONLINE' ? 'SALE_ONLINE' : 'SALE_POS', cartItem.quantity, unitPrice, itemTotal, channel]);
+      `, [txId, product.id, channel === 'ONLINE' ? 'SALE_ONLINE' : 'SALE_POS', cartItem.quantity, unitPrice, itemDiscountedTotal, channel]);
 
       processedItems.push({
         productName: product.name,
         quantity: cartItem.quantity,
         unitPrice,
-        totalPrice: itemTotal
+        totalPrice: itemDiscountedTotal
       });
     }
 

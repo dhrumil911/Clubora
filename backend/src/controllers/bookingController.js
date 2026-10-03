@@ -1,8 +1,15 @@
 import { query } from '../config/db.js';
 
 function timeToMinutes(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
   const [hours, minutes] = timeStr.split(':').map(Number);
   return hours * 60 + minutes;
+}
+
+function minutesToTime(totalMins) {
+  const endH = Math.floor(totalMins / 60);
+  const endM = totalMins % 60;
+  return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 }
 
 export async function getCourts(req, res) {
@@ -89,64 +96,71 @@ export async function getBookings(req, res) {
 
 export async function createBooking(req, res) {
   try {
-    const {
+    let {
       courtId,
       memberId,
       customerName,
       bookingDate,
       startTime,
-      endTime,
+      durationMinutes = 60,
       isSocialPlay = false,
       playersCount = 1
     } = req.body;
 
-    if (!courtId || !bookingDate || !startTime || !endTime) {
-      return res.status(400).json({ error: 'Court, booking date, start time, and end time are required.' });
+    // 1. Basic Field Presence
+    if (!courtId || !bookingDate || !startTime) {
+      return res.status(400).json({ error: 'Court, booking date, and start time are required.' });
     }
 
+    // 2. Validate 30-Minute Start Time Boundary
+    const timeParts = startTime.split(':').map(Number);
+    if (timeParts.length !== 2 || isNaN(timeParts[0]) || isNaN(timeParts[1])) {
+      return res.status(400).json({ error: 'Invalid start time format. Use HH:MM format.' });
+    }
+    const [startH, startM] = timeParts;
+    if (startM !== 0 && startM !== 30) {
+      return res.status(400).json({ error: 'Start time must be on a 30-minute boundary (e.g., 06:00, 06:30, 07:00).' });
+    }
+
+    // 3. Enforce Session Duration = 60 Minutes (1 Hour)
+    if (parseInt(durationMinutes, 10) !== 60 && req.body.endTime) {
+      const requestedDuration = timeToMinutes(req.body.endTime) - timeToMinutes(startTime);
+      if (requestedDuration !== 60) {
+        return res.status(400).json({ error: 'Session duration must be exactly 1 hour (60 minutes).' });
+      }
+    }
+
+    const newStartMins = timeToMinutes(startTime);
+    const newEndMins = newStartMins + 60; // Exactly 1 hour
+    const endTime = minutesToTime(newEndMins);
+
+    // 4. Validate Court Existence
     const courtRows = await query('SELECT * FROM courts WHERE id = $1', [courtId]);
     if (courtRows.length === 0) {
       return res.status(404).json({ error: 'Court not found.' });
     }
     const court = courtRows[0];
 
-    const newStart = timeToMinutes(startTime);
-    const newEnd = timeToMinutes(endTime);
-
-    if (newEnd <= newStart) {
-      return res.status(400).json({ error: 'End time must be after start time.' });
-    }
-
-    // 1. Anti-Double Booking Check (unless social play is enabled)
-    if (!isSocialPlay) {
-      const existingBookings = await query(`
-        SELECT start_time, end_time FROM bookings
-        WHERE court_id = $1 AND booking_date = $2 AND status = 'CONFIRMED' AND is_social_play = false
-      `, [courtId, bookingDate]);
-
-      for (const b of existingBookings) {
-        const existStart = timeToMinutes(b.start_time);
-        const existEnd = timeToMinutes(b.end_time);
-
-        if (newStart < existEnd && newEnd > existStart) {
-          return res.status(400).json({
-            error: `Court "${court.name}" is already booked from ${b.start_time} to ${b.end_time} on ${bookingDate}. Double-booking is not allowed!`
-          });
-        }
+    // Derive Member ID from JWT if logged in as MEMBER and memberId not provided
+    let targetMemberId = memberId;
+    if (req.user && req.user.role === 'MEMBER' && !targetMemberId) {
+      const memberLookup = await query('SELECT id FROM members WHERE email = $1', [req.user.email]);
+      if (memberLookup.length > 0) {
+        targetMemberId = memberLookup[0].id;
       }
     }
 
-    // 2. Member Daily Limit Check (Max 2 bookings per member per day)
+    // 5. Member Daily Limit Check (Maximum 2 bookings per member per day)
     let discountPercent = 0;
     let displayName = customerName || 'Walk-in Customer';
 
-    if (memberId) {
+    if (targetMemberId) {
       const memberRows = await query(`
         SELECT m.name, t.court_discount_percent 
         FROM members m
         JOIN membership_tiers t ON m.tier_id = t.id
         WHERE m.id = $1
-      `, [memberId]);
+      `, [targetMemberId]);
 
       if (memberRows.length === 0) {
         return res.status(404).json({ error: 'Selected member not found.' });
@@ -158,7 +172,7 @@ export async function createBooking(req, res) {
       const dailyCountRes = await query(`
         SELECT COUNT(*) FROM bookings
         WHERE member_id = $1 AND booking_date = $2 AND status = 'CONFIRMED'
-      `, [memberId, bookingDate]);
+      `, [targetMemberId, bookingDate]);
 
       if (parseInt(dailyCountRes[0].count, 10) >= 2) {
         return res.status(400).json({
@@ -167,9 +181,27 @@ export async function createBooking(req, res) {
       }
     }
 
-    // 3. Fee calculation
-    const durationHours = (newEnd - newStart) / 60;
-    const originalFee = parseFloat(court.hourly_rate) * durationHours;
+    // 6. Overlapping Booking Check (requested_start < existing_end AND requested_end > existing_start)
+    if (!isSocialPlay) {
+      const existingBookings = await query(`
+        SELECT start_time, end_time FROM bookings
+        WHERE court_id = $1 AND booking_date = $2 AND status = 'CONFIRMED' AND is_social_play = false
+      `, [courtId, bookingDate]);
+
+      for (const b of existingBookings) {
+        const existStart = timeToMinutes(b.start_time);
+        const existEnd = timeToMinutes(b.end_time);
+
+        if (newStartMins < existEnd && newEndMins > existStart) {
+          return res.status(400).json({
+            error: `Court "${court.name}" is already booked from ${b.start_time} to ${b.end_time} on ${bookingDate}. Overlapping booking is not allowed!`
+          });
+        }
+      }
+    }
+
+    // 7. Fee Calculation (Exactly 1 Hour = 1.0 * hourly_rate)
+    const originalFee = parseFloat(court.hourly_rate); // 1 hour session
     const discountFee = (originalFee * discountPercent) / 100;
     const finalFee = Math.max(0, originalFee - discountFee);
 
@@ -181,14 +213,14 @@ export async function createBooking(req, res) {
         is_social_play, players_count, original_fee, discount_fee, final_fee, payment_status, status
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'PAID', 'CONFIRMED')
     `, [
-      bookingId, courtId, memberId || null, displayName, bookingDate, startTime, endTime,
+      bookingId, courtId, targetMemberId || null, displayName, bookingDate, startTime, endTime,
       Boolean(isSocialPlay), parseInt(playersCount, 10) || 1, originalFee, discountFee, finalFee
     ]);
 
     return res.status(201).json({
       id: bookingId,
       courtId,
-      memberId: memberId || null,
+      memberId: targetMemberId || null,
       customerName: displayName,
       bookingDate,
       startTime,

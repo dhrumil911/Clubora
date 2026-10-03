@@ -339,15 +339,13 @@ export default function BookingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Duration</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Session Duration</label>
                   <select
-                    value={bookingForm.durationMinutes}
-                    onChange={(e) => setBookingForm({ ...bookingForm, durationMinutes: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500"
+                    disabled
+                    value={60}
+                    className="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 cursor-not-allowed"
                   >
-                    <option value={60}>1 Hour Session</option>
-                    <option value={90}>1.5 Hours Session</option>
-                    <option value={120}>2 Hours Session</option>
+                    <option value={60}>1 Hour Session (Fixed)</option>
                   </select>
                 </div>
               </div>
