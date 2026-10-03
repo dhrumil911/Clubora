@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Users, Calendar, ShoppingBag, Coffee, Target, LayoutDashboard, Globe, 
-  LogOut, ShieldCheck, ChevronDown, User, Shield, Lock, Award, Home, Sparkles
+  LogOut, ShieldCheck, ChevronDown, User, Shield, Lock, Award, Home, Sparkles, UserPlus, LogIn
 } from 'lucide-react';
 
 export default function Navbar({ user, onLogout }) {
@@ -41,7 +41,7 @@ export default function Navbar({ user, onLogout }) {
 
   const getRoleLabel = (role) => {
     switch (role) {
-      case 'OWNER': return 'Owner';
+      case 'OWNER': return 'Club Owner';
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK': return 'Front Desk Staff';
       case 'BAR_SHOP_STAFF':
@@ -66,22 +66,26 @@ export default function Navbar({ user, onLogout }) {
                 CLUBORA
               </span>
               <span className="text-[10px] font-semibold text-sky-400 tracking-widest uppercase">
-                Sports Club System
+                Sports Club Management System
               </span>
             </div>
           </Link>
 
           {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-300">
+          <nav className="hidden md:flex items-center gap-5 text-sm font-semibold text-slate-300">
             <Link to="/" className={`hover:text-white transition ${location.pathname === '/' ? 'text-sky-400 font-bold' : ''}`}>
               Home
             </Link>
 
             {user ? (
               <>
-                <Link to={getDashboardPath(user.role)} className="hover:text-white transition flex items-center gap-1 text-sky-400 font-bold bg-sky-950/80 px-3 py-1.5 rounded-lg border border-sky-800">
-                  <LayoutDashboard className="w-4 h-4" /> My Dashboard
+                <Link 
+                  to={getDashboardPath(user.role)} 
+                  className="hover:text-white transition flex items-center gap-1.5 text-sky-400 font-bold bg-sky-950/80 px-3 py-1.5 rounded-xl border border-sky-800/80 shadow-sm"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-sky-400" /> My Dashboard
                 </Link>
+
                 {(user.role === 'OWNER' || user.role === 'FRONT_DESK_STAFF' || user.role === 'FRONT_DESK') && (
                   <>
                     <Link to="/members" className={`hover:text-white transition ${location.pathname === '/members' ? 'text-sky-400 font-bold' : ''}`}>
@@ -95,6 +99,7 @@ export default function Navbar({ user, onLogout }) {
                     </Link>
                   </>
                 )}
+
                 {(user.role === 'OWNER' || user.role === 'BAR_SHOP_STAFF' || user.role === 'BAR') && (
                   <>
                     <Link to="/shop" className={`hover:text-white transition ${location.pathname === '/shop' ? 'text-sky-400 font-bold' : ''}`}>
@@ -122,8 +127,8 @@ export default function Navbar({ user, onLogout }) {
             {user ? (
               /* Logged In User Badge & Logout */
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl">
-                  <div className="w-8 h-8 rounded-lg bg-sky-600/30 text-sky-400 font-bold flex items-center justify-center text-xs border border-sky-500/30">
+                <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-xl shadow-inner">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm">
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div className="text-left hidden sm:block">
@@ -139,7 +144,7 @@ export default function Navbar({ user, onLogout }) {
                     onLogout();
                     navigate('/');
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-bold transition shadow-sm"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-950/50 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded-xl text-xs font-bold transition shadow-sm"
                   title="Sign Out"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -147,92 +152,109 @@ export default function Navbar({ user, onLogout }) {
                 </button>
               </div>
             ) : (
-              /* Authentication Dropdown (Task 2) */
-              <div className="relative">
-                <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-sky-600/20 transition-all"
+              /* Logged Out: Sign In Dropdown & Join Club Button */
+              <div className="flex items-center gap-2">
+                
+                {/* Sign Up / Join Club Button */}
+                <Link
+                  to="/auth/member/signup"
+                  className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-xl font-bold text-xs transition"
                 >
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>Authentication</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
+                  <UserPlus className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Join Club</span>
+                </Link>
 
-                {/* Dropdown Menu */}
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
-                    
-                    {/* Header */}
-                    <div className="px-4 py-2.5 bg-slate-950 border-b border-slate-800 font-bold text-slate-400 text-[10px] uppercase tracking-wider">
-                      Select Access Portal
-                    </div>
+                {/* Sign In Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center gap-2 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md shadow-sky-600/20 transition-all"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>Sign In</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
 
-                    <div className="p-2 space-y-1">
+                  {/* Dropdown Menu */}
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
                       
-                      {/* 1. Member Section */}
-                      <div className="px-3 py-1 text-[10px] font-extrabold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <User className="w-3 h-3" /> Member Portal
+                      {/* Main Portal Direct Link */}
+                      <div className="p-2 border-b border-slate-800 bg-slate-950/60">
+                        <Link
+                          to="/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center justify-between px-3 py-2 bg-gradient-to-r from-sky-950 to-indigo-950 border border-sky-800/60 hover:border-sky-600 text-sky-200 rounded-xl font-bold transition"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                            Unified Login Portal
+                          </span>
+                          <span className="text-[10px] text-sky-400">All Roles &rarr;</span>
+                        </Link>
                       </div>
-                      <Link
-                        to="/auth/member/login"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
-                      >
-                        Member Login
-                      </Link>
-                      <Link
-                        to="/auth/member/signup"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-3 py-2 rounded-xl hover:bg-sky-600/20 text-sky-300 font-semibold transition"
-                      >
-                        Member Sign Up (Create Account)
-                      </Link>
 
-                      <div className="my-1 border-t border-slate-800"></div>
-
-                      {/* 2. Front Desk Staff */}
-                      <div className="px-3 py-1 text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Shield className="w-3 h-3" /> Front Desk Staff
+                      {/* Role Specific Portals */}
+                      <div className="px-4 py-2 bg-slate-950 font-bold text-slate-400 text-[10px] uppercase tracking-wider">
+                        Role Access Portals
                       </div>
-                      <Link
-                        to="/auth/front-desk/login"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
-                      >
-                        Front Desk Staff Login
-                      </Link>
 
-                      <div className="my-1 border-t border-slate-800"></div>
+                      <div className="p-2 space-y-1">
+                        
+                        {/* 1. Member */}
+                        <Link
+                          to="/auth/member/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <User className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>Member Portal</span>
+                        </Link>
 
-                      {/* 3. Bar / Shop Staff */}
-                      <div className="px-3 py-1 text-[10px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Coffee className="w-3 h-3" /> Bar & Shop Staff
+                        {/* 2. Front Desk Staff */}
+                        <Link
+                          to="/auth/front-desk/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <Shield className="w-3.5 h-3.5 text-sky-400" />
+                          <span>Front Desk Staff</span>
+                        </Link>
+
+                        {/* 3. Bar / Shop Staff */}
+                        <Link
+                          to="/auth/bar-shop/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                          <span>Bar & Shop Staff</span>
+                        </Link>
+
+                        {/* 4. Owner */}
+                        <Link
+                          to="/auth/owner/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <Award className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Club Owner Portal</span>
+                        </Link>
+
+                        <div className="my-1 border-t border-slate-800"></div>
+
+                        <Link
+                          to="/auth/member/signup"
+                          onClick={() => setDropdownOpen(false)}
+                          className="block text-center px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-750 text-sky-400 font-bold transition text-[11px]"
+                        >
+                          Create Member Account
+                        </Link>
+
                       </div>
-                      <Link
-                        to="/auth/bar-shop/login"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
-                      >
-                        Bar / Shop Staff Login
-                      </Link>
-
-                      <div className="my-1 border-t border-slate-800"></div>
-
-                      {/* 4. Owner */}
-                      <div className="px-3 py-1 text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Award className="w-3 h-3" /> Club Owner
-                      </div>
-                      <Link
-                        to="/auth/owner/login"
-                        onClick={() => setDropdownOpen(false)}
-                        className="block px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
-                      >
-                        Owner Login
-                      </Link>
-
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             )}
 

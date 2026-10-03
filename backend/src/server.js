@@ -9,6 +9,9 @@ import * as shopController from './controllers/shopController.js';
 import * as barController from './controllers/barController.js';
 import * as crmController from './controllers/crmController.js';
 import * as dashboardController from './controllers/dashboardController.js';
+import * as invoiceController from './controllers/invoiceController.js';
+import * as shiftController from './controllers/shiftController.js';
+import * as reportController from './controllers/reportController.js';
 
 import { query } from './config/db.js';
 
@@ -23,7 +26,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Root Route
+// Root Route Endpoint
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
@@ -96,6 +99,29 @@ app.post('/api/crm/quotes', authenticateToken, authorizeRoles('FRONT_DESK_STAFF'
 
 // 6. Owner Dashboard & Financial Reports Routes (Owner ONLY)
 app.get('/api/dashboard/metrics', authenticateToken, authorizeRoles('OWNER'), dashboardController.getOwnerDashboardMetrics);
+
+// 7. Invoice Management Routes (Owner ONLY)
+app.get('/api/invoices', authenticateToken, authorizeRoles('OWNER'), invoiceController.getInvoices);
+app.get('/api/invoices/summary', authenticateToken, authorizeRoles('OWNER'), invoiceController.getInvoiceSummary);
+app.post('/api/invoices', authenticateToken, authorizeRoles('OWNER'), invoiceController.createInvoice);
+app.put('/api/invoices/:id', authenticateToken, authorizeRoles('OWNER'), invoiceController.updateInvoice);
+app.put('/api/invoices/:id/pay', authenticateToken, authorizeRoles('OWNER'), invoiceController.markInvoicePaid);
+app.put('/api/invoices/:id/overdue', authenticateToken, authorizeRoles('OWNER'), invoiceController.markInvoiceOverdue);
+app.delete('/api/invoices/:id', authenticateToken, authorizeRoles('OWNER'), invoiceController.deleteInvoice);
+
+// 8. Staff Shifts & Leave Management Routes (Owner ONLY)
+app.get('/api/shifts', authenticateToken, authorizeRoles('OWNER'), shiftController.getShifts);
+app.post('/api/shifts', authenticateToken, authorizeRoles('OWNER'), shiftController.createShift);
+app.put('/api/shifts/:id', authenticateToken, authorizeRoles('OWNER'), shiftController.updateShift);
+app.delete('/api/shifts/:id', authenticateToken, authorizeRoles('OWNER'), shiftController.deleteShift);
+app.get('/api/leaves', authenticateToken, authorizeRoles('OWNER'), shiftController.getLeaveRequests);
+app.post('/api/leaves', authenticateToken, authorizeRoles('OWNER'), shiftController.createLeaveRequest);
+app.put('/api/leaves/:id/review', authenticateToken, authorizeRoles('OWNER'), shiftController.reviewLeaveRequest);
+
+// 9. Tax Reports & Export Routes (Owner ONLY)
+app.get('/api/reports/revenue', authenticateToken, authorizeRoles('OWNER'), reportController.getRevenueReport);
+app.get('/api/reports/tax', authenticateToken, authorizeRoles('OWNER'), reportController.getTaxReport);
+app.get('/api/reports/export', authenticateToken, authorizeRoles('OWNER'), reportController.getExportData);
 
 const server = app.listen(PORT, () => {
   console.log(`Clubora Backend Server running on http://localhost:${PORT}`);

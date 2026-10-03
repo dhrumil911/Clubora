@@ -159,6 +159,22 @@ CREATE TABLE IF NOT EXISTS invoices (
   amount NUMERIC(10,2) NOT NULL,
   due_date VARCHAR(20) NOT NULL,
   status VARCHAR(50) DEFAULT 'PENDING',
+  paid_at TIMESTAMP WITH TIME ZONE,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS leave_requests (
+  id VARCHAR(36) PRIMARY KEY,
+  staff_name VARCHAR(255) NOT NULL,
+  role VARCHAR(100) NOT NULL,
+  leave_type VARCHAR(50) NOT NULL DEFAULT 'CASUAL',
+  start_date VARCHAR(20) NOT NULL,
+  end_date VARCHAR(20) NOT NULL,
+  reason TEXT,
+  status VARCHAR(50) DEFAULT 'PENDING',
+  reviewed_by VARCHAR(255),
+  reviewed_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -167,3 +183,6 @@ CREATE INDEX IF NOT EXISTS idx_members_email ON members(email);
 CREATE INDEX IF NOT EXISTS idx_members_tier_id ON members(tier_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_court_date ON bookings(court_id, booking_date);
 CREATE INDEX IF NOT EXISTS idx_bar_tabs_status ON bar_tabs(status);
+CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
+CREATE INDEX IF NOT EXISTS idx_shifts_date ON shifts(date);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status);

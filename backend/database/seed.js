@@ -180,33 +180,71 @@ export async function runMigrationsAndSeed() {
       console.log('✅ Seeded bar tabs.');
     }
 
-    // 10. Seed Leads, Quotes, Shifts & Invoices
+    // 10. Seed Leads, Quotes
     const leadsCount = await query('SELECT COUNT(*) FROM leads');
     if (parseInt(leadsCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO leads (id, name, phone, email, interest, status, notes) VALUES
-        ('lead-1', 'Robert Vance', '+1 555-0711', 'robert.vance@techcorp.com', 'Corporate Membership & Court Rental', 'QUOTED', 'Interested in booking 2 courts every Tuesday evening.')`
+        ('lead-1', 'Robert Vance', '+1 555-0711', 'robert.vance@techcorp.com', 'Corporate Membership & Court Rental', 'QUOTED', 'Interested in booking 2 courts every Tuesday evening.'),
+        ('lead-2', 'Emily Chen', '+1 555-0822', 'emily.chen@startupco.com', 'Junior Membership for Son', 'CONTACTED', 'Asked about junior coaching programs.'),
+        ('lead-3', 'Marcus Johnson', '+1 555-0933', 'marcus.j@gmail.com', 'Gold Membership Trial', 'NEW', 'Found us on Google, wants to visit this weekend.')`
       );
       await query(
         `INSERT INTO quotes (id, lead_id, tier_name, court_hours, total_price, valid_until, status) VALUES
         ('q-1', 'lead-1', 'Gold Corporate', 8, 480.00, '2026-10-31', 'SENT')`
       );
+      console.log('✅ Seeded leads & quotes.');
     }
 
+    // 11. Seed Shifts
     const shiftsCount = await query('SELECT COUNT(*) FROM shifts');
     if (parseInt(shiftsCount[0].count, 10) === 0) {
       const todayStr = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
       await query(
         `INSERT INTO shifts (id, staff_name, role, date, start_time, end_time, status) VALUES
         ('sh-1', 'Sarah Front Desk', 'Front Desk', $1, '08:00', '16:00', 'SCHEDULED'),
-        ('sh-2', 'Mike Bar Lead', 'Bar/Kitchen', $1, '15:00', '23:00', 'SCHEDULED')`,
-        [todayStr]
+        ('sh-2', 'Mike Bar Lead', 'Bar/Kitchen', $1, '15:00', '23:00', 'SCHEDULED'),
+        ('sh-3', 'James Coach', 'Tennis Coach', $1, '09:00', '17:00', 'SCHEDULED'),
+        ('sh-4', 'Sarah Front Desk', 'Front Desk', $2, '08:00', '16:00', 'SCHEDULED'),
+        ('sh-5', 'Mike Bar Lead', 'Bar/Kitchen', $2, '12:00', '20:00', 'SCHEDULED'),
+        ('sh-6', 'Lisa Receptionist', 'Front Desk', $2, '16:00', '22:00', 'SCHEDULED')`,
+        [todayStr, tomorrowStr]
       );
+      console.log('✅ Seeded shifts.');
+    }
+
+    // 12. Seed Invoices (multiple with varying statuses)
+    const invoicesCount = await query('SELECT COUNT(*) FROM invoices');
+    if (parseInt(invoicesCount[0].count, 10) === 0) {
       await query(
-        `INSERT INTO invoices (id, invoice_number, client_name, client_email, type, amount, due_date, status) VALUES
-        ('inv-1', 'INV-2026-001', 'TechCorp Solutions', 'billing@techcorp.com', 'CORPORATE', 1200.00, '2026-10-25', 'PENDING')`
+        `INSERT INTO invoices (id, invoice_number, client_name, client_email, type, amount, due_date, status, notes) VALUES
+        ('inv-1', 'INV-2026-001', 'TechCorp Solutions', 'billing@techcorp.com', 'CORPORATE', 1200.00, '2026-10-25', 'PENDING', 'Quarterly corporate membership & court reservation package.'),
+        ('inv-2', 'INV-2026-002', 'StartupCo Ltd', 'accounts@startupco.com', 'CORPORATE', 800.00, '2026-10-15', 'PENDING', 'Monthly team-building court rental.'),
+        ('inv-3', 'INV-2026-003', 'City Sports Academy', 'finance@citysports.org', 'MEMBERSHIP', 2400.00, '2026-09-30', 'OVERDUE', 'Annual junior coaching program fees.'),
+        ('inv-4', 'INV-2026-004', 'Wellness Works Inc', 'pay@wellnessworks.com', 'CORPORATE', 650.00, '2026-09-20', 'PAID', 'Employee wellness program - September.')`
       );
-      console.log('✅ Seeded shifts & invoices.');
+      console.log('✅ Seeded invoices.');
+    }
+
+    // 13. Seed Leave Requests
+    const leaveCount = await query('SELECT COUNT(*) FROM leave_requests');
+    if (parseInt(leaveCount[0].count, 10) === 0) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const nextWeek = new Date();
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      const nextWeekStr = nextWeek.toISOString().split('T')[0];
+
+      await query(
+        `INSERT INTO leave_requests (id, staff_name, role, leave_type, start_date, end_date, reason, status) VALUES
+        ('lv-1', 'Sarah Front Desk', 'Front Desk', 'CASUAL', $1, $2, 'Family vacation planned.', 'PENDING'),
+        ('lv-2', 'Mike Bar Lead', 'Bar/Kitchen', 'SICK', $1, $1, 'Medical appointment.', 'APPROVED')`,
+        [todayStr, nextWeekStr]
+      );
+      console.log('✅ Seeded leave requests.');
     }
 
     console.log('🎉 PostgreSQL database initialization completed cleanly!');

@@ -3,29 +3,25 @@ import { Navigate } from 'react-router-dom';
 
 export default function ProtectedRoute({ user, allowedRoles, children }) {
   if (!user) {
-    // Unauthenticated user -> redirect to login
-    return <Navigate to="/auth/member/login" replace />;
+    // Unauthenticated user -> redirect to unified login portal
+    return <Navigate to="/login" replace />;
   }
 
-  const uRole = user.role;
+  const uRole = (user.role || '').toUpperCase();
 
   // Check role authorization
   const isAuthorized = allowedRoles.some(role => {
-    if (role === uRole) return true;
-    if (role === 'FRONT_DESK_STAFF' && (uRole === 'FRONT_DESK' || uRole === 'FRONT_DESK_STAFF')) return true;
-    if (role === 'BAR_SHOP_STAFF' && (uRole === 'BAR' || uRole === 'BAR_SHOP_STAFF')) return true;
-    if (role === 'OWNER' && uRole === 'OWNER') return true;
-    if (role === 'MEMBER' && uRole === 'MEMBER') return true;
+    const r = role.toUpperCase();
+    if (r === uRole) return true;
+    if (r === 'FRONT_DESK_STAFF' && (uRole === 'FRONT_DESK' || uRole === 'FRONT_DESK_STAFF')) return true;
+    if (r === 'BAR_SHOP_STAFF' && (uRole === 'BAR' || uRole === 'BAR_SHOP_STAFF')) return true;
+    if (r === 'OWNER' && uRole === 'OWNER') return true;
+    if (r === 'MEMBER' && uRole === 'MEMBER') return true;
     return false;
   });
 
-  // Owner super-admin access allowed to all dashboards
-  if (uRole === 'OWNER') {
-    return children;
-  }
-
   if (!isAuthorized) {
-    // Role mismatch -> redirect to user's designated role dashboard
+    // Role mismatch -> redirect non-owners to their designated role dashboard
     switch (uRole) {
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK':

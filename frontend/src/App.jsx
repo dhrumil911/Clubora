@@ -22,6 +22,9 @@ import ShopPage from './pages/ShopPage';
 import BarPOSPage from './pages/BarPOSPage';
 import CRMPage from './pages/CRMPage';
 import DashboardPage from './pages/DashboardPage';
+import InvoicesPage from './pages/InvoicesPage';
+import StaffShiftsPage from './pages/StaffShiftsPage';
+import TaxReportsPage from './pages/TaxReportsPage';
 import PublicWebsitePage from './pages/PublicWebsitePage';
 
 export default function App() {
@@ -77,7 +80,17 @@ export default function App() {
             {/* Task 1: Public Landing Page */}
             <Route path="/" element={<PublicLandingPage />} />
 
-            {/* Task 5 & Task 12: Authentication Pages */}
+            {/* Unified Authentication Pages */}
+            <Route
+              path="/login"
+              element={<LoginPage onLoginSuccess={handleLoginSuccess} />}
+            />
+            <Route
+              path="/signup"
+              element={<MemberSignupPage onLoginSuccess={handleLoginSuccess} />}
+            />
+
+            {/* Dedicated Role Auth Pages */}
             <Route
               path="/auth/member/login"
               element={
@@ -223,10 +236,28 @@ export default function App() {
             />
 
             <Route
-              path="/dashboard"
+              path="/invoices"
               element={
                 <ProtectedRoute user={user} allowedRoles={['OWNER']}>
-                  <DashboardPage />
+                  <InvoicesPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/shifts"
+              element={
+                <ProtectedRoute user={user} allowedRoles={['OWNER']}>
+                  <StaffShiftsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reports"
+              element={
+                <ProtectedRoute user={user} allowedRoles={['OWNER']}>
+                  <TaxReportsPage />
                 </ProtectedRoute>
               }
             />

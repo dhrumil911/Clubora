@@ -26,8 +26,8 @@ export async function login(req, res) {
       return res.status(401).json({ error: 'Invalid email or password.' });
     }
 
-    // Role Verification if targetRole is requested by the login portal
-    if (targetRole) {
+    // Role Verification if targetRole is explicitly requested by the portal
+    if (targetRole && targetRole !== 'ANY') {
       const uRole = user.role;
       let matches = (uRole === targetRole);
 
@@ -39,7 +39,7 @@ export async function login(req, res) {
 
       if (!matches) {
         return res.status(403).json({
-          error: `Access Denied: This account (${user.role}) is not authorized for the ${targetRole} portal.`
+          error: `Access Denied: Account role (${user.role.replace('_', ' ')}) is not authorized for ${targetRole.replace('_', ' ')} portal.`
         });
       }
     }
