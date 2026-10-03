@@ -134,7 +134,6 @@ export default function PublicLandingPage({ user }) {
         </div>
       </section>
 
-<<<<<<< ours
       {/* About Section */}
       <section id="about" className="py-16 bg-slate-900 border-t border-slate-800">
         <div className="max-w-6xl mx-auto px-4">
@@ -187,7 +186,10 @@ export default function PublicLandingPage({ user }) {
               </ul>
             </div>
 
-=======
+          </div>
+        </div>
+      </section>
+
       {/* Role Access Portals Section */}
       <section className="py-12 bg-slate-900/50 border-y border-slate-800 px-4">
         <div className="max-w-6xl mx-auto text-center space-y-6">
@@ -203,12 +205,12 @@ export default function PublicLandingPage({ user }) {
               <span className="text-xs font-bold text-slate-200">Front Desk</span>
             </Link>
 
-            <Link to="/auth/bar/login" className="p-4 bg-slate-900 border border-slate-800 hover:border-amber-500/80 rounded-2xl flex flex-col items-center gap-2 group transition">
+            <Link to="/auth/bar-shop/login" className="p-4 bg-slate-900 border border-slate-800 hover:border-amber-500/80 rounded-2xl flex flex-col items-center gap-2 group transition">
               <Coffee className="w-6 h-6 text-amber-400 group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-slate-200">Bar Staff</span>
             </Link>
 
-            <Link to="/auth/shop/login" className="p-4 bg-slate-900 border border-slate-800 hover:border-purple-500/80 rounded-2xl flex flex-col items-center gap-2 group transition">
+            <Link to="/auth/bar-shop/login" className="p-4 bg-slate-900 border border-slate-800 hover:border-purple-500/80 rounded-2xl flex flex-col items-center gap-2 group transition">
               <ShoppingBag className="w-6 h-6 text-purple-400 group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-slate-200">Shop Staff</span>
             </Link>
@@ -217,7 +219,6 @@ export default function PublicLandingPage({ user }) {
               <Award className="w-6 h-6 text-emerald-400 group-hover:scale-110 transition-transform" />
               <span className="text-xs font-bold text-slate-200">Club Owner</span>
             </Link>
->>>>>>> theirs
           </div>
         </div>
       </section>
