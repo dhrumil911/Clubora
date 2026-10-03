@@ -84,10 +84,16 @@ app.delete('/api/bookings/:id', authenticateToken, authorizeRoles('FRONT_DESK_ST
 // 3. Gear Shop & Inventory POS Routes (Bar/Shop Staff, Shop Staff, Front Desk & Owner)
 app.get('/api/shop/products', authenticateToken, shopController.getProducts);
 app.post('/api/shop/checkout', authenticateToken, shopController.checkout);
+app.post('/api/shop/products', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.createProduct);
+app.put('/api/shop/products/:id', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.updateProduct);
+app.delete('/api/shop/products/:id', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.deleteProduct);
 app.post('/api/shop/products/:id/restock', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.restockProduct);
 
 // 4. Bar & Cafeteria POS Routes (Bar Staff, Bar/Shop Staff, Front Desk & Owner)
 app.get('/api/bar/menu', authenticateToken, barController.getBarItems);
+app.post('/api/bar/menu', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.createBarItem);
+app.put('/api/bar/menu/:id', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.updateBarItem);
+app.delete('/api/bar/menu/:id', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.deleteBarItem);
 app.get('/api/bar/tabs', authenticateToken, barController.getTabs);
 app.post('/api/bar/tabs', authenticateToken, barController.createOrUpdateTab);
 app.post('/api/bar/tabs/:id/settle', authenticateToken, barController.settleTab);

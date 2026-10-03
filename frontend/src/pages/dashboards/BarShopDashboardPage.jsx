@@ -43,8 +43,8 @@ export default function BarShopDashboardPage({ user }) {
 
       {/* Active Tab View */}
       <div>
-        {activeTab === 'bar' && <BarPOSPage />}
-        {activeTab === 'shop' && <ShopPage />}
+        {activeTab === 'bar' && <BarPOSPage user={user} />}
+        {activeTab === 'shop' && <ShopPage user={user} />}
       </div>
 
     </div>

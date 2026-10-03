@@ -417,3 +417,79 @@ export async function deleteBarExpense(req, res) {
   }
 }
 
+/**
+ * Add a new Bar Item (Beverage / Meal / Snack)
+ */
+export async function createBarItem(req, res) {
+  try {
+    const { name, category, price, isAvailable = true } = req.body;
+    if (!name || price === undefined) {
+      return res.status(400).json({ error: 'Item name and price are required.' });
+    }
+
+    const id = `bar-${Date.now()}`;
+    const numPrice = parseFloat(price);
+    const cat = (category || 'BEVERAGE').toUpperCase();
+
+    await query(`
+      INSERT INTO bar_items (id, name, category, price, is_available)
+      VALUES ($1, $2, $3, $4, $5)
+    `, [id, name.trim(), cat, numPrice, !!isAvailable]);
+
+    return res.status(201).json({
+      message: 'Bar item added successfully.',
+      item: { id, name: name.trim(), category: cat, price: numPrice, isAvailable: !!isAvailable }
+    });
+  } catch (error) {
+    console.error('createBarItem Error:', error);
+    return res.status(500).json({ error: 'Failed to create bar menu item.' });
+  }
+}
+
+/**
+ * Update Bar Item
+ */
+export async function updateBarItem(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, category, price, isAvailable } = req.body;
+
+    const existing = await query('SELECT * FROM bar_items WHERE id = $1', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Bar item not found.' });
+    }
+
+    const item = existing[0];
+    const cat = category ? category.toUpperCase() : item.category;
+    const numPrice = price !== undefined ? parseFloat(price) : parseFloat(item.price);
+    const available = isAvailable !== undefined ? !!isAvailable : item.is_available;
+
+    await query(`
+      UPDATE bar_items
+      SET name = $1, category = $2, price = $3, is_available = $4
+      WHERE id = $5
+    `, [name ? name.trim() : item.name, cat, numPrice, available, id]);
+
+    return res.json({ message: 'Bar item updated successfully.' });
+  } catch (error) {
+    console.error('updateBarItem Error:', error);
+    return res.status(500).json({ error: 'Failed to update bar item.' });
+  }
+}
+
+/**
+ * Delete Bar Item
+ */
+export async function deleteBarItem(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await query('DELETE FROM bar_items WHERE id = $1 RETURNING id', [id]);
+    if (result.length === 0) {
+      return res.status(404).json({ error: 'Bar item not found.' });
+    }
+    return res.json({ message: 'Bar item deleted successfully.', id });
+  } catch (error) {
+    console.error('deleteBarItem Error:', error);
+    return res.status(500).json({ error: 'Failed to delete bar item.' });
+  }
+}
