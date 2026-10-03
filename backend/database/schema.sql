@@ -164,6 +164,9 @@ CREATE TABLE IF NOT EXISTS invoices (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Migration: ensure notes column exists (may be missing if table was created before schema update)
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS notes TEXT;
+
 CREATE TABLE IF NOT EXISTS leave_requests (
   id VARCHAR(36) PRIMARY KEY,
   staff_name VARCHAR(255) NOT NULL,

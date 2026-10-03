@@ -196,3 +196,83 @@ export async function restockProduct(req, res) {
     return res.status(500).json({ error: 'Failed to restock product.' });
   }
 }
+
+export async function createProduct(req, res) {
+  try {
+    const { name, category, price, stockQuantity, lowStockThreshold, description } = req.body;
+
+    if (!name || price === undefined || stockQuantity === undefined) {
+      return res.status(400).json({ error: 'Name, price, and initial stock quantity are required.' });
+    }
+
+    const id = `prd-${Date.now()}`;
+    const cat = (category || 'ACCESSORIES').toUpperCase();
+    const numPrice = parseFloat(price);
+    const qty = parseInt(stockQuantity, 10);
+    const threshold = lowStockThreshold ? parseInt(lowStockThreshold, 10) : 5;
+
+    await query(`
+      INSERT INTO products (id, name, category, price, stock_quantity, low_stock_threshold, description)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [id, name.trim(), cat, numPrice, qty, threshold, description || '']);
+
+    return res.status(201).json({
+      message: 'Product created successfully!',
+      product: {
+        id,
+        name: name.trim(),
+        category: cat,
+        price: numPrice,
+        stockQuantity: qty,
+        lowStockThreshold: threshold,
+        description: description || '',
+        isLowStock: qty <= threshold
+      }
+    });
+  } catch (error) {
+    console.error('createProduct Error:', error);
+    return res.status(500).json({ error: 'Failed to create new product.' });
+  }
+}
+
+export async function updateProduct(req, res) {
+  try {
+    const { id } = req.params;
+    const { name, category, price, stockQuantity, lowStockThreshold, description } = req.body;
+
+    const prdRes = await query('SELECT * FROM products WHERE id = $1', [id]);
+    if (prdRes.length === 0) {
+      return res.status(404).json({ error: 'Product not found.' });
+    }
+
+    const cat = category ? category.toUpperCase() : prdRes[0].category;
+    const numPrice = price !== undefined ? parseFloat(price) : parseFloat(prdRes[0].price);
+    const qty = stockQuantity !== undefined ? parseInt(stockQuantity, 10) : parseInt(prdRes[0].stock_quantity, 10);
+    const threshold = lowStockThreshold !== undefined ? parseInt(lowStockThreshold, 10) : parseInt(prdRes[0].low_stock_threshold, 10);
+
+    await query(`
+      UPDATE products
+      SET name = $1, category = $2, price = $3, stock_quantity = $4, low_stock_threshold = $5, description = $6, updated_at = CURRENT_TIMESTAMP
+      WHERE id = $7
+    `, [name ? name.trim() : prdRes[0].name, cat, numPrice, qty, threshold, description !== undefined ? description : prdRes[0].description, id]);
+
+    return res.json({ message: 'Product updated successfully.' });
+  } catch (error) {
+    console.error('updateProduct Error:', error);
+    return res.status(500).json({ error: 'Failed to update product.' });
+  }
+}
+
+export async function deleteProduct(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await query('DELETE FROM products WHERE id = $1 RETURNING id', [id]);
+    if (result.length === 0) {
+      return res.status(404).json({ error: 'Product not found.' });
+    }
+    return res.json({ message: 'Product deleted successfully.', id });
+  } catch (error) {
+    console.error('deleteProduct Error:', error);
+    return res.status(500).json({ error: 'Failed to delete product.' });
+  }
+}

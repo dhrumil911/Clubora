@@ -135,16 +135,18 @@ export default function DailyBarExpenseTracker({ userRole }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                setExpenseDate(selectedDate);
-                setShowAddForm(!showAddForm);
-              }}
-              className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{showAddForm ? 'Close Form' : 'Log Daily Bar Expense'}</span>
-            </button>
+            {userRole !== 'MEMBER' && (
+              <button
+                onClick={() => {
+                  setExpenseDate(selectedDate);
+                  setShowAddForm(!showAddForm);
+                }}
+                className="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{showAddForm ? 'Close Form' : 'Log Daily Bar Expense'}</span>
+              </button>
+            )}
 
             <button
               onClick={fetchBarExpenses}
@@ -401,7 +403,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
                   <th className="px-4 py-3">Logged By</th>
                   <th className="px-4 py-3">Notes</th>
                   <th className="px-4 py-3 text-right">Amount</th>
-                  <th className="px-4 py-3 text-center">Action</th>
+                  {userRole !== 'MEMBER' && <th className="px-4 py-3 text-center">Action</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
@@ -424,15 +426,17 @@ export default function DailyBarExpenseTracker({ userRole }) {
                     <td className="px-4 py-3.5 text-right font-mono font-bold text-rose-400 text-sm">
                       ${parseFloat(exp.amount).toFixed(2)}
                     </td>
-                    <td className="px-4 py-3.5 text-center">
-                      <button
-                        onClick={() => handleDeleteExpense(exp.id)}
-                        className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg transition"
-                        title="Delete record"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
+                    {userRole !== 'MEMBER' && (
+                      <td className="px-4 py-3.5 text-center">
+                        <button
+                          onClick={() => handleDeleteExpense(exp.id)}
+                          className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 rounded-lg transition"
+                          title="Delete record"
+                          >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

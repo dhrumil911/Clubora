@@ -231,7 +231,7 @@ export default function App() {
               path="/bookings"
               element={
                 <ProtectedRoute user={user} allowedRoles={['MEMBER', 'FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER']}>
-                  <BookingsPage />
+                  <BookingsPage user={user} />
                 </ProtectedRoute>
               }
             />
@@ -240,7 +240,7 @@ export default function App() {
               path="/shop"
               element={
                 <ProtectedRoute user={user} allowedRoles={['MEMBER', 'BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER']}>
-                  <ShopPage />
+                  <ShopPage user={user} />
                 </ProtectedRoute>
               }
             />
