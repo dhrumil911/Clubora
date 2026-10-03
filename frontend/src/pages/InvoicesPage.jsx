@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import {
   FileText, Plus, DollarSign, AlertTriangle, CheckCircle2, Clock,
-  Send, X, Filter, CreditCard, Building2, Search
+  Send, X, Filter, CreditCard, Building2, Search, Download
 } from 'lucide-react';
+import { downloadInvoicePDF } from '../utils/pdfGenerator';
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState([]);
@@ -100,12 +101,26 @@ export default function InvoicesPage() {
             Generate, track, and manage client invoices across memberships and corporate accounts.
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all"
-        >
-          <Plus className="w-4 h-4" /> New Invoice
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (invoices.length === 0) return alert('No invoices to export.');
+              invoices.forEach((inv, i) => {
+                setTimeout(() => downloadInvoicePDF(inv), i * 350);
+              });
+            }}
+            disabled={invoices.length === 0}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-2xl text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
+          >
+            <Download className="w-4 h-4 text-indigo-600" /> Export All Invoices (PDF)
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-bold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> New Invoice
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -194,6 +209,13 @@ export default function InvoicesPage() {
                     <div className="text-xl font-extrabold text-slate-900">${inv.amount.toFixed(2)}</div>
                     {inv.paidAt && <div className="text-[10px] text-emerald-600 font-semibold">Paid {new Date(inv.paidAt).toLocaleDateString()}</div>}
                   </div>
+                  <button
+                    onClick={() => downloadInvoicePDF(inv)}
+                    title="Download Invoice PDF"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl text-xs font-bold border border-indigo-200 transition active:scale-95 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" /> PDF
+                  </button>
                   {inv.status === 'PENDING' && (
                     <>
                       <button onClick={() => handleMarkPaid(inv.id)}
