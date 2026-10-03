@@ -16,78 +16,35 @@ export async function runMigrationsAndSeed() {
     await query(schemaSql);
     console.log('✅ PostgreSQL database tables created successfully.');
 
-    // 2. Seed Default Accounts
+    // 2. Seed Default Accounts (using UPSERT to guarantee credentials on all databases)
     const defaultPasswordOwner = await bcrypt.hash('Clubora@2026', 10);
     const defaultPasswordFront = await bcrypt.hash('Frontdesk@2026', 10);
     const defaultPasswordBar = await bcrypt.hash('Barshop@2026', 10);
+    const defaultPasswordOnlyBar = await bcrypt.hash('Bar@2026', 10);
+    const defaultPasswordShop = await bcrypt.hash('Shop@2026', 10);
     const defaultPasswordMember = await bcrypt.hash('password123', 10);
 
-    // Seed Owner: owner@clubora.com (Task 6)
-    const existingOwner = await query('SELECT * FROM users WHERE email = $1', ['owner@clubora.com']);
-    if (existingOwner.length === 0) {
-      await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-owner-default', 'owner@clubora.com', $1, 'Club Owner (Alex Morgan)', 'OWNER')`,
-        [defaultPasswordOwner]
-      );
-      console.log('✅ Seeded default Owner account (owner@clubora.com).');
-    }
+    const defaultAccounts = [
+      { id: 'usr-owner-default', email: 'owner@clubora.com', hash: defaultPasswordOwner, name: 'Club Owner (Alex Morgan)', role: 'OWNER' },
+      { id: 'usr-owner', email: 'owner@championsclub.com', hash: defaultPasswordOwner, name: 'Owner (Alex Morgan)', role: 'OWNER' },
+      { id: 'usr-front-default', email: 'frontdesk@clubora.com', hash: defaultPasswordFront, name: 'Sarah Front Desk', role: 'FRONT_DESK_STAFF' },
+      { id: 'usr-front', email: 'frontdesk@championsclub.com', hash: defaultPasswordFront, name: 'Sarah Front Desk', role: 'FRONT_DESK_STAFF' },
+      { id: 'usr-bar-default', email: 'barshop@clubora.com', hash: defaultPasswordBar, name: 'Mike Bar & Shop Manager', role: 'BAR_SHOP_STAFF' },
+      { id: 'usr-bar-staff-only', email: 'bar@clubora.com', hash: defaultPasswordOnlyBar, name: 'Mike Bar Lead', role: 'BAR' },
+      { id: 'usr-bar-legacy', email: 'bar@championsclub.com', hash: defaultPasswordBar, name: 'Mike Bar Lead', role: 'BAR_SHOP_STAFF' },
+      { id: 'usr-shop-staff-only', email: 'shop@clubora.com', hash: defaultPasswordShop, name: 'Alex ProShop Lead', role: 'SHOP' },
+    ];
 
-    // Seed Owner legacy fallback
-    const legacyOwner = await query('SELECT * FROM users WHERE email = $1', ['owner@championsclub.com']);
-    if (legacyOwner.length === 0) {
+    for (const acc of defaultAccounts) {
       await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-owner', 'owner@championsclub.com', $1, 'Owner (Alex Morgan)', 'OWNER')`,
-        [defaultPasswordOwner]
+        `INSERT INTO users (id, email, password_hash, name, role)
+         VALUES ($1, $2, $3, $4, $5)
+         ON CONFLICT (email) 
+         DO UPDATE SET password_hash = EXCLUDED.password_hash, role = EXCLUDED.role, name = EXCLUDED.name`,
+        [acc.id, acc.email, acc.hash, acc.name, acc.role]
       );
     }
-
-    // Seed Front Desk Staff: frontdesk@clubora.com (Task 7)
-    const existingFront = await query('SELECT * FROM users WHERE email = $1', ['frontdesk@clubora.com']);
-    if (existingFront.length === 0) {
-      await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-front-default', 'frontdesk@clubora.com', $1, 'Sarah Front Desk', 'FRONT_DESK_STAFF')`,
-        [defaultPasswordFront]
-      );
-      console.log('✅ Seeded default Front Desk Staff account (frontdesk@clubora.com).');
-    }
-
-    // Seed Bar Staff: bar@clubora.com
-    const defaultPasswordOnlyBar = await bcrypt.hash('Bar@2026', 10);
-    const existingBarOnly = await query('SELECT * FROM users WHERE email = $1', ['bar@clubora.com']);
-    if (existingBarOnly.length === 0) {
-      await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-bar-staff-only', 'bar@clubora.com', $1, 'Mike Bar Lead', 'BAR')`,
-        [defaultPasswordOnlyBar]
-      );
-      console.log('✅ Seeded default Bar Staff account (bar@clubora.com).');
-    }
-
-    // Seed Shop Staff: shop@clubora.com
-    const defaultPasswordShop = await bcrypt.hash('Shop@2026', 10);
-    const existingShop = await query('SELECT * FROM users WHERE email = $1', ['shop@clubora.com']);
-    if (existingShop.length === 0) {
-      await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-shop-staff-only', 'shop@clubora.com', $1, 'Alex ProShop Lead', 'SHOP')`,
-        [defaultPasswordShop]
-      );
-      console.log('✅ Seeded default Shop Staff account (shop@clubora.com).');
-    }
-
-    // Seed Bar/Shop Staff combined legacy: barshop@clubora.com
-    const existingBar = await query('SELECT * FROM users WHERE email = $1', ['barshop@clubora.com']);
-    if (existingBar.length === 0) {
-      await query(
-        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-bar-default', 'barshop@clubora.com', $1, 'Mike Bar & Shop Manager', 'BAR_SHOP_STAFF')`,
-        [defaultPasswordBar]
-      );
-      console.log('✅ Seeded default Bar/Shop Staff account (barshop@clubora.com).');
-    }
+    console.log('✅ Seeded/Synchronized default user accounts (Owner, Front Desk, Bar, Shop).');
 
     // Seed Member User
     const existingMemberUser = await query('SELECT * FROM users WHERE email = $1', ['david.gold@example.com']);

@@ -48,6 +48,16 @@ const ROLES_CONFIG = [
     demo: { email: 'shop@clubora.com', password: 'Shop@2026' }
   },
   {
+    key: 'BAR_SHOP_STAFF',
+    label: 'Bar & Shop',
+    icon: Coffee,
+    color: 'from-teal-500 to-emerald-600',
+    borderColor: 'border-teal-500/50',
+    badgeBg: 'bg-teal-500/10 text-teal-400 border-teal-500/30',
+    subtitle: 'Gear Inventory POS & Bar Cafeteria Order Tabs',
+    demo: { email: 'barshop@clubora.com', password: 'Barshop@2026' }
+  },
+  {
     key: 'MEMBER',
     label: 'Club Member',
     icon: User,

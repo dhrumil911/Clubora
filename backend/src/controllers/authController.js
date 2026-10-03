@@ -32,7 +32,7 @@ export async function login(req, res) {
       let matches = (uRole === targetRole);
 
       // Support aliases
-      if (targetRole === 'FRONT_DESK_STAFF' && (uRole === 'FRONT_DESK' || uRole === 'FRONT_DESK_STAFF')) matches = true;
+      if ((targetRole === 'FRONT_DESK_STAFF' || targetRole === 'FRONT_DESK') && (uRole === 'FRONT_DESK' || uRole === 'FRONT_DESK_STAFF')) matches = true;
       if (targetRole === 'BAR_SHOP_STAFF' && (uRole === 'BAR' || uRole === 'SHOP' || uRole === 'BAR_SHOP_STAFF' || uRole === 'BAR_STAFF' || uRole === 'SHOP_STAFF')) matches = true;
       if ((targetRole === 'BAR_STAFF' || targetRole === 'BAR') && (uRole === 'BAR' || uRole === 'BAR_STAFF' || uRole === 'BAR_SHOP_STAFF')) matches = true;
       if ((targetRole === 'SHOP_STAFF' || targetRole === 'SHOP') && (uRole === 'SHOP' || uRole === 'SHOP_STAFF' || uRole === 'BAR_SHOP_STAFF')) matches = true;
