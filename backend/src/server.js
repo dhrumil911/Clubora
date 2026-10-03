@@ -23,6 +23,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Root Route
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'Clubora API Backend is running',
+    version: '1.0.0'
+  });
+});
+
 // PostgreSQL Connection Test Endpoint
 app.get('/api/db-test', async (req, res) => {
   try {
