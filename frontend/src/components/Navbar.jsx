@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Users, Calendar, ShoppingBag, Coffee, Target, LayoutDashboard, Globe, 
+import {
+  Users, Calendar, ShoppingBag, Coffee, Target, LayoutDashboard, Globe,
   LogOut, ShieldCheck, ChevronDown, User, Shield, Lock, Award, Home, Sparkles, UserPlus, LogIn
 } from 'lucide-react';
 
@@ -29,8 +29,13 @@ export default function Navbar({ user, onLogout }) {
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK':
         return '/front-desk';
-      case 'BAR_SHOP_STAFF':
+      case 'BAR_STAFF':
       case 'BAR':
+        return '/bar';
+      case 'SHOP_STAFF':
+      case 'SHOP':
+        return '/shop';
+      case 'BAR_SHOP_STAFF':
         return '/bar-shop';
       case 'MEMBER':
         return '/member';
@@ -44,8 +49,11 @@ export default function Navbar({ user, onLogout }) {
       case 'OWNER': return 'Club Owner';
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK': return 'Front Desk Staff';
-      case 'BAR_SHOP_STAFF':
-      case 'BAR': return 'Bar & Shop Staff';
+      case 'BAR_STAFF':
+      case 'BAR': return 'Bar Staff';
+      case 'SHOP_STAFF':
+      case 'SHOP': return 'Shop Staff';
+      case 'BAR_SHOP_STAFF': return 'Bar & Shop Staff';
       case 'MEMBER': return 'Club Member';
       default: return role;
     }
@@ -68,7 +76,7 @@ export default function Navbar({ user, onLogout }) {
     <header className="bg-slate-950 text-white border-b border-slate-800 sticky top-0 z-50 shadow-lg backdrop-blur-md bg-opacity-95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          
+
           {/* Logo & Brand */}
           <Link to="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-sky-400 flex items-center justify-center font-extrabold text-xl shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
@@ -107,8 +115,8 @@ export default function Navbar({ user, onLogout }) {
             </button>
 
             {user && (
-              <Link 
-                to={getDashboardPath(user.role)} 
+              <Link
+                to={getDashboardPath(user.role)}
                 className="hover:text-white transition flex items-center gap-1.5 text-sky-400 font-bold bg-sky-950/80 px-3 py-1.5 rounded-xl border border-sky-800/80 shadow-sm"
               >
                 <LayoutDashboard className="w-4 h-4 text-sky-400" /> My Dashboard
@@ -118,7 +126,7 @@ export default function Navbar({ user, onLogout }) {
 
           {/* Authentication & User Controls */}
           <div className="flex items-center gap-3" ref={dropdownRef}>
-            
+
             {user ? (
               /* Logged In User Badge & Logout */
               <div className="flex items-center gap-3">
@@ -149,7 +157,7 @@ export default function Navbar({ user, onLogout }) {
             ) : (
               /* Logged Out: Sign In Dropdown & Join Club Button */
               <div className="flex items-center gap-2">
-                
+
                 {/* Sign Up / Join Club Button */}
                 <Link
                   to="/auth/member/signup"
@@ -173,13 +181,13 @@ export default function Navbar({ user, onLogout }) {
                   {/* Dropdown Menu */}
                   {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
-                      
+
                       <div className="px-4 py-2 bg-slate-950 font-bold text-slate-400 text-[10px] uppercase tracking-wider">
                         Select Access Portal
                       </div>
 
                       <div className="p-2 space-y-1">
-                        
+
                         {/* 1. Member */}
                         <Link
                           to="/auth/member/login"
@@ -200,17 +208,27 @@ export default function Navbar({ user, onLogout }) {
                           <span>Front Desk Staff</span>
                         </Link>
 
-                        {/* 3. Bar / Shop Staff */}
+                        {/* 3. Bar Staff */}
                         <Link
-                          to="/auth/bar-shop/login"
+                          to="/auth/bar/login"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
                         >
                           <Coffee className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Bar & Shop Staff</span>
+                          <span>Bar Staff</span>
                         </Link>
 
-                        {/* 4. Owner */}
+                        {/* 4. Shop Staff */}
+                        <Link
+                          to="/auth/shop/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Shop Staff</span>
+                        </Link>
+
+                        {/* 5. Owner */}
                         <Link
                           to="/auth/owner/login"
                           onClick={() => setDropdownOpen(false)}

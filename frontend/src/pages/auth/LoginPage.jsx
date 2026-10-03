@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../../api';
 import { 
   Lock, Mail, AlertTriangle, CheckCircle2, ArrowRight, Shield, 
-  Award, User, Coffee, Eye, EyeOff, Sparkles, Key
+  Award, User, Coffee, Eye, EyeOff, Sparkles, Key, ShoppingBag
 } from 'lucide-react';
 
 const ROLES_CONFIG = [
@@ -28,14 +28,24 @@ const ROLES_CONFIG = [
     demo: { email: 'frontdesk@clubora.com', password: 'Frontdesk@2026' }
   },
   {
-    key: 'BAR_SHOP_STAFF',
-    label: 'Bar & Shop',
+    key: 'BAR_STAFF',
+    label: 'Bar Staff',
     icon: Coffee,
     color: 'from-amber-500 to-orange-600',
     borderColor: 'border-amber-500/50',
     badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    subtitle: 'Gear Shop POS Inventory & Cafeteria Bar Order Tabs',
-    demo: { email: 'barshop@clubora.com', password: 'Barshop@2026' }
+    subtitle: 'Cafeteria Bar Orders POS & Daily Bar Expenses Tracker',
+    demo: { email: 'bar@clubora.com', password: 'Bar@2026' }
+  },
+  {
+    key: 'SHOP_STAFF',
+    label: 'Shop Staff',
+    icon: ShoppingBag,
+    color: 'from-purple-500 to-pink-600',
+    borderColor: 'border-purple-500/50',
+    badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+    subtitle: 'Pro Shop Gear Inventory POS & Retail Sales',
+    demo: { email: 'shop@clubora.com', password: 'Shop@2026' }
   },
   {
     key: 'MEMBER',
@@ -79,8 +89,11 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
       case 'OWNER': return '/owner';
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK': return '/front-desk';
-      case 'BAR_SHOP_STAFF':
-      case 'BAR': return '/bar-shop';
+      case 'BAR_STAFF':
+      case 'BAR': return '/bar';
+      case 'SHOP_STAFF':
+      case 'SHOP': return '/shop';
+      case 'BAR_SHOP_STAFF': return '/bar-shop';
       case 'MEMBER': return '/member';
       default: return '/member';
     }

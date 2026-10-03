@@ -178,7 +178,21 @@ CREATE TABLE IF NOT EXISTS leave_requests (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Performance Indexes
+DROP TABLE IF EXISTS bar_expenses CASCADE;
+
+CREATE TABLE IF NOT EXISTS bar_expenses (
+  id VARCHAR(36) PRIMARY KEY,
+  expense_date VARCHAR(20) NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  category VARCHAR(100) DEFAULT 'Inventory',
+  amount NUMERIC(10,2) NOT NULL,
+  notes TEXT,
+  created_by VARCHAR(255),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_bar_expenses_date ON bar_expenses(expense_date);
+
 CREATE INDEX IF NOT EXISTS idx_members_email ON members(email);
 CREATE INDEX IF NOT EXISTS idx_members_tier_id ON members(tier_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_court_date ON bookings(court_id, booking_date);

@@ -5,12 +5,14 @@ import CRMPage from '../CRMPage';
 import InvoicesPage from '../InvoicesPage';
 import StaffShiftsPage from '../StaffShiftsPage';
 import TaxReportsPage from '../TaxReportsPage';
+import DailyBarExpenseTracker from '../../components/DailyBarExpenseTracker';
 import {
-  Award, LayoutDashboard, Target, FileText, Clock, BarChart3
+  Award, LayoutDashboard, Target, FileText, Clock, BarChart3, Coffee
 } from 'lucide-react';
 
 const TABS = [
   { key: 'dashboard', label: 'Analytics', icon: LayoutDashboard },
+  { key: 'bar-expenses', label: 'Daily Bar Expenses', icon: Coffee },
   { key: 'crm', label: 'CRM & Leads', icon: Target },
   { key: 'invoices', label: 'Invoices', icon: FileText },
   { key: 'shifts', label: 'Staff & HR', icon: Clock },
@@ -23,7 +25,8 @@ export default function OwnerDashboardPage({ user }) {
   const uRole = (user?.role || '').toUpperCase();
   if (user && uRole !== 'OWNER') {
     const redirectPath = (uRole === 'FRONT_DESK_STAFF' || uRole === 'FRONT_DESK') ? '/front-desk'
-      : (uRole === 'BAR_SHOP_STAFF' || uRole === 'BAR') ? '/bar-shop'
+      : (uRole === 'BAR_SHOP_STAFF' || uRole === 'BAR') ? '/bar'
+      : (uRole === 'SHOP_STAFF' || uRole === 'SHOP') ? '/shop'
       : '/member';
     return <Navigate to={redirectPath} replace />;
   }
@@ -68,6 +71,7 @@ export default function OwnerDashboardPage({ user }) {
       {/* Active Tab Content */}
       <div>
         {activeTab === 'dashboard' && <DashboardPage />}
+        {activeTab === 'bar-expenses' && <DailyBarExpenseTracker userRole="OWNER" />}
         {activeTab === 'crm' && <CRMPage />}
         {activeTab === 'invoices' && <InvoicesPage />}
         {activeTab === 'shifts' && <StaffShiftsPage />}
