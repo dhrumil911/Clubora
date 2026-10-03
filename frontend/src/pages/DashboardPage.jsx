@@ -3,8 +3,9 @@ import api from '../api';
 import { 
   LayoutDashboard, DollarSign, TrendingUp, ShoppingBag, Coffee, 
   Calendar, CreditCard, Users, FileText, Clock, Shield, Target,
-  Percent, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw
+  Percent, ArrowUpRight, CheckCircle2, AlertTriangle, RefreshCw, Download
 } from 'lucide-react';
+import { downloadFinanceReportPDF } from '../utils/pdfGenerator';
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
@@ -84,26 +85,38 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Time Filter Buttons */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 self-start md:self-auto">
-          {[
-            { key: 'all', label: 'All Time' },
-            { key: 'today', label: 'Today' },
-            { key: 'week', label: 'This Week' },
-            { key: 'month', label: 'This Month' }
-          ].map(t => (
-            <button
-              key={t.key}
-              onClick={() => setPeriod(t.key)}
-              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition ${
-                period === t.key
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
+          {/* Time Filter Buttons */}
+          <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+            {[
+              { key: 'all', label: 'All Time' },
+              { key: 'today', label: 'Today' },
+              { key: 'week', label: 'This Week' },
+              { key: 'month', label: 'This Month' }
+            ].map(t => (
+              <button
+                key={t.key}
+                onClick={() => setPeriod(t.key)}
+                className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition ${
+                  period === t.key
+                    ? 'bg-slate-900 text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Download Finance PDF Button */}
+          <button
+            onClick={() => downloadFinanceReportPDF(data, period)}
+            disabled={!data || !data.metrics}
+            className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold shadow-md shadow-emerald-600/20 transition active:scale-95 cursor-pointer"
+            title="Download executive financial summary in PDF format"
+          >
+            <Download className="w-4 h-4" /> Download Finance PDF
+          </button>
         </div>
       </div>
 

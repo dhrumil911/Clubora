@@ -4,6 +4,7 @@ import {
   BarChart3, TrendingUp, Download, Calendar, DollarSign,
   FileText, ArrowUpRight, ArrowDownRight, Percent, Building2
 } from 'lucide-react';
+import { downloadFinanceReportPDF } from '../utils/pdfGenerator';
 
 export default function TaxReportsPage() {
   const [revenueData, setRevenueData] = useState(null);
@@ -27,19 +28,31 @@ export default function TaxReportsPage() {
     finally { setLoading(false); }
   };
 
-  const handleExport = async () => {
+  const handleExportPDF = async () => {
     try {
       setExporting(true);
       const res = await api.get('/reports/export', { params: { period } });
-      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `clubora-report-${period}-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) { alert('Failed to export.'); }
-    finally { setExporting(false); }
+      const rev = revenueData?.totalRevenue || 0;
+      const b = revenueData?.breakdown || {};
+      downloadFinanceReportPDF({
+        metrics: {
+          totalEarned: rev,
+          courtRevenue: b.courts || 0,
+          shopRevenue: b.shop || 0,
+          barRevenue: b.bar || 0,
+          membershipRevenue: b.memberships || 0,
+          totalOwed: 0,
+          totalMembersCount: 4,
+          activeMembersCount: 4
+        },
+        invoices: res.data?.invoices || []
+      }, period);
+    } catch (err) { 
+      console.error(err);
+      alert('Failed to export finance PDF.'); 
+    } finally { 
+      setExporting(false); 
+    }
   };
 
   if (loading) {
@@ -97,9 +110,10 @@ export default function TaxReportsPage() {
               </button>
             ))}
           </div>
-          <button onClick={handleExport} disabled={exporting}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50">
-            <Download className="w-3.5 h-3.5" /> {exporting ? 'Exporting...' : 'Export Data'}
+          <button onClick={handleExportPDF} disabled={exporting}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition-all disabled:opacity-50 cursor-pointer"
+            title="Download complete financial & tax statement in PDF format">
+            <Download className="w-3.5 h-3.5" /> {exporting ? 'Generating PDF...' : 'Download Finance PDF'}
           </button>
         </div>
       </div>

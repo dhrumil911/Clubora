@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../api';
-import { User, Calendar, ShieldCheck, Star, Award, CheckCircle, Clock, ShoppingBag } from 'lucide-react';
+import MemberBarCafeOrdering from '../../components/MemberBarCafeOrdering';
+import { User, Calendar, ShieldCheck, Star, Award, CheckCircle, Clock, ShoppingBag, Coffee, Utensils } from 'lucide-react';
 
 export default function MemberDashboardPage({ user }) {
   const [memberInfo, setMemberInfo] = useState(null);
@@ -26,10 +27,10 @@ export default function MemberDashboardPage({ user }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
       
       {/* Member Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white p-8 rounded-3xl border border-slate-800 shadow-xl mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-indigo-950 text-white p-8 rounded-3xl border border-slate-800 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="w-16 h-16 rounded-2xl bg-sky-600/30 border border-sky-400/30 text-sky-300 font-extrabold text-2xl flex items-center justify-center shadow-inner">
             {user?.name ? user.name.charAt(0).toUpperCase() : 'M'}
@@ -55,6 +56,12 @@ export default function MemberDashboardPage({ user }) {
           >
             <Calendar className="w-4 h-4" /> Book a Court
           </Link>
+          <a
+            href="#bar-cafe-section"
+            className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl text-xs shadow-lg shadow-amber-500/20 transition flex items-center gap-2"
+          >
+            <Coffee className="w-4 h-4 fill-slate-950" /> Order Bar & Cafe
+          </a>
           <Link
             to="/shop"
             className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition flex items-center gap-2"
@@ -64,7 +71,7 @@ export default function MemberDashboardPage({ user }) {
         </div>
       </div>
 
-      {/* Grid: Tier Perks & Booking History */}
+      {/* Grid: Tier Perks & Quick Services */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Tier Benefits */}
@@ -104,22 +111,33 @@ export default function MemberDashboardPage({ user }) {
               <Calendar className="w-5 h-5 text-sky-600" />
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <Link to="/bookings" className="p-4 bg-sky-50 rounded-2xl border border-sky-100 hover:border-sky-300 transition group">
                 <div className="text-xs font-bold text-sky-700 uppercase">Court Scheduler</div>
-                <div className="text-slate-900 font-extrabold text-base mt-1 group-hover:text-sky-600">Reserve Tennis, Cricket or Padel</div>
-                <div className="text-xs text-slate-500 mt-1">Select 1-hour sessions starting every 30 minutes</div>
+                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-sky-600">Reserve Courts</div>
+                <div className="text-[11px] text-slate-500 mt-1">1-hour sessions starting every 30m</div>
               </Link>
 
+              <a href="#bar-cafe-section" className="p-4 bg-amber-50 rounded-2xl border border-amber-100 hover:border-amber-300 transition group">
+                <div className="text-xs font-bold text-amber-700 uppercase">Cafeteria Bar</div>
+                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-amber-600">Order Food & Drinks</div>
+                <div className="text-[11px] text-slate-500 mt-1">Auto {memberInfo?.tier?.barDiscountPercent || 20}% member discount</div>
+              </a>
+
               <Link to="/shop" className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100 hover:border-indigo-300 transition group">
-                <div className="text-xs font-bold text-indigo-700 uppercase">Sofa Gear Ordering</div>
-                <div className="text-slate-900 font-extrabold text-base mt-1 group-hover:text-indigo-600">Buy Equipment & Rackets</div>
-                <div className="text-xs text-slate-500 mt-1">Automatic {memberInfo?.tier?.shopDiscountPercent || 20}% member discount</div>
+                <div className="text-xs font-bold text-indigo-700 uppercase">Gear Pro Shop</div>
+                <div className="text-slate-900 font-extrabold text-sm mt-1 group-hover:text-indigo-600">Buy Equipment</div>
+                <div className="text-[11px] text-slate-500 mt-1">Auto {memberInfo?.tier?.shopDiscountPercent || 20}% member discount</div>
               </Link>
             </div>
           </div>
         </div>
 
+      </div>
+
+      {/* Dynamic Member Bar & Cafe Ordering Section */}
+      <div id="bar-cafe-section">
+        <MemberBarCafeOrdering user={user} memberInfo={memberInfo} />
       </div>
 
     </div>

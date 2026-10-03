@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { ShoppingBag, AlertTriangle, Plus, Minus, ShoppingCart, RefreshCw, CheckCircle2, Truck, Store, Tag } from 'lucide-react';
+import { ShoppingBag, AlertTriangle, Plus, Minus, ShoppingCart, RefreshCw, CheckCircle2, Truck, Store, Tag, Download } from 'lucide-react';
+import { downloadReceiptPDF } from '../utils/pdfGenerator';
 
 export default function ShopPage() {
   const [products, setProducts] = useState([]);
@@ -78,6 +79,9 @@ export default function ShopPage() {
         channel
       });
       setCheckoutResult(res.data.receipt);
+      if (res.data.receipt) {
+        downloadReceiptPDF(res.data.receipt);
+      }
       setCart([]);
       fetchProducts();
     } catch (err) {
@@ -315,9 +319,13 @@ export default function ShopPage() {
 
             {/* Receipt Modal Result */}
             {checkoutResult && (
-              <div className="mt-6 bg-slate-900 text-white p-4 rounded-2xl text-xs space-y-2 font-mono">
+              <div className="mt-6 bg-slate-900 text-white p-4 rounded-2xl text-xs space-y-2 font-mono border border-slate-800 shadow-xl">
                 <div className="text-center font-bold text-sky-400 pb-2 border-b border-slate-800 text-sm">
-                  CHAMPIONS CLUB RECEIPT
+                  CLUBORA OFFICIAL RECEIPT
+                </div>
+                <div className="flex justify-between">
+                  <span>Receipt #:</span>
+                  <span className="font-bold text-sky-300">{checkoutResult.receiptNumber || 'REC-CONFIRMED'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Customer:</span>
@@ -327,16 +335,34 @@ export default function ShopPage() {
                   <span>Channel:</span>
                   <span>{checkoutResult.channel}</span>
                 </div>
-                <div className="flex justify-between font-bold text-emerald-400 pt-1 border-t border-slate-800">
-                  <span>Paid:</span>
+                {checkoutResult.items && (
+                  <div className="pt-2 border-t border-slate-800 space-y-1">
+                    {checkoutResult.items.map((it, i) => (
+                      <div key={i} className="flex justify-between text-[11px] text-slate-300">
+                        <span>{it.quantity}x {it.productName}</span>
+                        <span>${(it.totalPrice || (it.unitPrice * it.quantity)).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex justify-between font-bold text-emerald-400 pt-2 border-t border-slate-800">
+                  <span>Total Paid:</span>
                   <span>${checkoutResult.finalTotal.toFixed(2)}</span>
                 </div>
-                <button
-                  onClick={() => setCheckoutResult(null)}
-                  className="w-full mt-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded text-[11px] font-sans text-slate-300"
-                >
-                  Dismiss Receipt
-                </button>
+                <div className="pt-2 flex gap-2 font-sans">
+                  <button
+                    onClick={() => downloadReceiptPDF(checkoutResult)}
+                    className="flex-1 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-md shadow-sky-600/30 transition active:scale-95"
+                  >
+                    <Download className="w-3.5 h-3.5" /> Print / Download PDF Receipt
+                  </button>
+                  <button
+                    onClick={() => setCheckoutResult(null)}
+                    className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs text-slate-300 transition"
+                  >
+                    Dismiss
+                  </button>
+                </div>
               </div>
             )}
 

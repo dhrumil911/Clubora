@@ -54,12 +54,36 @@ export async function runMigrationsAndSeed() {
       console.log('✅ Seeded default Front Desk Staff account (frontdesk@clubora.com).');
     }
 
-    // Seed Bar/Shop Staff: barshop@clubora.com (Task 7)
+    // Seed Bar Staff: bar@clubora.com
+    const defaultPasswordOnlyBar = await bcrypt.hash('Bar@2026', 10);
+    const existingBarOnly = await query('SELECT * FROM users WHERE email = $1', ['bar@clubora.com']);
+    if (existingBarOnly.length === 0) {
+      await query(
+        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
+        ('usr-bar-staff-only', 'bar@clubora.com', $1, 'Mike Bar Lead', 'BAR')`,
+        [defaultPasswordOnlyBar]
+      );
+      console.log('✅ Seeded default Bar Staff account (bar@clubora.com).');
+    }
+
+    // Seed Shop Staff: shop@clubora.com
+    const defaultPasswordShop = await bcrypt.hash('Shop@2026', 10);
+    const existingShop = await query('SELECT * FROM users WHERE email = $1', ['shop@clubora.com']);
+    if (existingShop.length === 0) {
+      await query(
+        `INSERT INTO users (id, email, password_hash, name, role) VALUES 
+        ('usr-shop-staff-only', 'shop@clubora.com', $1, 'Alex ProShop Lead', 'SHOP')`,
+        [defaultPasswordShop]
+      );
+      console.log('✅ Seeded default Shop Staff account (shop@clubora.com).');
+    }
+
+    // Seed Bar/Shop Staff combined legacy: barshop@clubora.com
     const existingBar = await query('SELECT * FROM users WHERE email = $1', ['barshop@clubora.com']);
     if (existingBar.length === 0) {
       await query(
         `INSERT INTO users (id, email, password_hash, name, role) VALUES 
-        ('usr-bar-default', 'barshop@clubora.com', $1, 'Mike Bar Lead', 'BAR_SHOP_STAFF')`,
+        ('usr-bar-default', 'barshop@clubora.com', $1, 'Mike Bar & Shop Manager', 'BAR_SHOP_STAFF')`,
         [defaultPasswordBar]
       );
       console.log('✅ Seeded default Bar/Shop Staff account (barshop@clubora.com).');
@@ -245,6 +269,25 @@ export async function runMigrationsAndSeed() {
         [todayStr, nextWeekStr]
       );
       console.log('✅ Seeded leave requests.');
+    }
+
+    // 14. Seed Bar Expenses
+    const expensesCount = await query('SELECT COUNT(*) FROM bar_expenses');
+    if (parseInt(expensesCount[0].count, 10) === 0) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+      await query(
+        `INSERT INTO bar_expenses (id, expense_date, title, category, amount, notes, created_by) VALUES
+        ('exp-1', $1, 'Fresh Fruit & Berry Stock', 'Ingredients', 45.00, 'Berries and citrus for protein shakes', 'Mike Bar Lead'),
+        ('exp-2', $1, 'Craft Beer Keg Refill', 'Beverages', 120.00, '2x Craft Pale Ale kegs restocked', 'Mike Bar Lead'),
+        ('exp-3', $1, 'Ice Supply & Cups', 'Supplies', 25.50, 'Bagged ice & eco-friendly cups', 'Mike Bar Lead'),
+        ('exp-4', $2, 'Espresso Coffee Beans (5kg)', 'Ingredients', 65.00, 'Dark roast Arabica beans', 'Mike Bar Lead')`,
+        [todayStr, yesterdayStr]
+      );
+      console.log('✅ Seeded sample bar expenses.');
     }
 
     console.log('🎉 PostgreSQL database initialization completed cleanly!');
