@@ -29,8 +29,13 @@ export default function Navbar({ user, onLogout }) {
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK':
         return '/front-desk';
-      case 'BAR_SHOP_STAFF':
+      case 'BAR_STAFF':
       case 'BAR':
+        return '/bar';
+      case 'SHOP_STAFF':
+      case 'SHOP':
+        return '/shop';
+      case 'BAR_SHOP_STAFF':
         return '/bar-shop';
       case 'MEMBER':
         return '/member';
@@ -44,8 +49,11 @@ export default function Navbar({ user, onLogout }) {
       case 'OWNER': return 'Club Owner';
       case 'FRONT_DESK_STAFF':
       case 'FRONT_DESK': return 'Front Desk Staff';
-      case 'BAR_SHOP_STAFF':
-      case 'BAR': return 'Bar & Shop Staff';
+      case 'BAR_STAFF':
+      case 'BAR': return 'Bar Staff';
+      case 'SHOP_STAFF':
+      case 'SHOP': return 'Shop Staff';
+      case 'BAR_SHOP_STAFF': return 'Bar & Shop Staff';
       case 'MEMBER': return 'Club Member';
       default: return role;
     }
@@ -100,13 +108,13 @@ export default function Navbar({ user, onLogout }) {
                   </>
                 )}
 
-                {(user.role === 'OWNER' || user.role === 'BAR_SHOP_STAFF' || user.role === 'BAR') && (
+                {(user.role === 'OWNER' || user.role === 'BAR_SHOP_STAFF' || user.role === 'BAR_STAFF' || user.role === 'BAR' || user.role === 'MEMBER') && (
                   <>
                     <Link to="/shop" className={`hover:text-white transition ${location.pathname === '/shop' ? 'text-sky-400 font-bold' : ''}`}>
                       Gear Shop
                     </Link>
                     <Link to="/bar" className={`hover:text-white transition ${location.pathname === '/bar' ? 'text-sky-400 font-bold' : ''}`}>
-                      Bar POS
+                      Bar & Cafe
                     </Link>
                   </>
                 )}
@@ -221,17 +229,27 @@ export default function Navbar({ user, onLogout }) {
                           <span>Front Desk Staff</span>
                         </Link>
 
-                        {/* 3. Bar / Shop Staff */}
+                        {/* 3. Bar Staff */}
                         <Link
-                          to="/auth/bar-shop/login"
+                          to="/auth/bar/login"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
                         >
                           <Coffee className="w-3.5 h-3.5 text-amber-400" />
-                          <span>Bar & Shop Staff</span>
+                          <span>Bar Staff</span>
                         </Link>
 
-                        {/* 4. Owner */}
+                        {/* 4. Shop Staff */}
+                        <Link
+                          to="/auth/shop/login"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800 text-slate-200 font-semibold transition"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Shop Staff</span>
+                        </Link>
+
+                        {/* 5. Owner */}
                         <Link
                           to="/auth/owner/login"
                           onClick={() => setDropdownOpen(false)}

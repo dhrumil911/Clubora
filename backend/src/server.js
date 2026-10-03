@@ -81,16 +81,21 @@ app.get('/api/bookings', authenticateToken, bookingController.getBookings);
 app.post('/api/bookings', authenticateToken, bookingController.createBooking);
 app.delete('/api/bookings/:id', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), bookingController.cancelBooking);
 
-// 3. Gear Shop & Inventory POS Routes (Bar/Shop Staff, Front Desk & Owner)
+// 3. Gear Shop & Inventory POS Routes (Bar/Shop Staff, Shop Staff, Front Desk & Owner)
 app.get('/api/shop/products', authenticateToken, shopController.getProducts);
 app.post('/api/shop/checkout', authenticateToken, shopController.checkout);
-app.post('/api/shop/products/:id/restock', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'BAR', 'OWNER'), shopController.restockProduct);
+app.post('/api/shop/products/:id/restock', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.restockProduct);
 
-// 4. Bar & Cafeteria POS Routes (Bar/Shop Staff, Front Desk & Owner)
+// 4. Bar & Cafeteria POS Routes (Bar Staff, Bar/Shop Staff, Front Desk & Owner)
 app.get('/api/bar/menu', authenticateToken, barController.getBarItems);
 app.get('/api/bar/tabs', authenticateToken, barController.getTabs);
 app.post('/api/bar/tabs', authenticateToken, barController.createOrUpdateTab);
 app.post('/api/bar/tabs/:id/settle', authenticateToken, barController.settleTab);
+
+// 4b. Bar Expenses Routes (Bar Staff & Owner)
+app.get('/api/bar/expenses', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.getBarExpenses);
+app.post('/api/bar/expenses', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.addBarExpense);
+app.delete('/api/bar/expenses/:id', authenticateToken, authorizeRoles('BAR_STAFF', 'BAR', 'BAR_SHOP_STAFF', 'OWNER'), barController.deleteBarExpense);
 
 // 5. CRM Leads & Quote Engine Routes (Front Desk & Owner)
 app.get('/api/crm/leads', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), crmController.getLeads);

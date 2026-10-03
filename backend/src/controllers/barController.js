@@ -111,6 +111,32 @@ export async function createOrUpdateTab(req, res) {
 
     let activeTabId = tabId;
 
+    // Table Occupancy Check: prevent duplicate open tabs on the same dine-in table
+    const targetTable = tableNumber || 'Counter';
+    const isSpecialTable = (
+      targetTable.toLowerCase().includes('counter') || 
+      targetTable.toLowerCase().includes('takeaway') || 
+      targetTable.toLowerCase().includes('packed') ||
+      targetTable.toLowerCase().includes('parcel')
+    );
+
+    if (!isSpecialTable) {
+      let checkSql = "SELECT id, tab_number, customer_name FROM bar_tabs WHERE status = 'OPEN' AND LOWER(table_number) = LOWER($1)";
+      const checkParams = [targetTable];
+      if (activeTabId) {
+        checkSql += " AND id != $2";
+        checkParams.push(activeTabId);
+      }
+      const occupiedRes = await client.query(checkSql, checkParams);
+      if (occupiedRes.rows.length > 0) {
+        const occ = occupiedRes.rows[0];
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          error: `${targetTable} is currently IN USE by ${occ.customer_name} (${occ.tab_number}). Another customer cannot be seated here until the table is empty or settled.`
+        });
+      }
+    }
+
     if (!activeTabId) {
       const countRes = await client.query('SELECT COUNT(*) FROM bar_tabs');
       const tabNum = `TAB-${String(parseInt(countRes.rows[0].count, 10) + 101).padStart(3, '0')}`;
@@ -119,7 +145,7 @@ export async function createOrUpdateTab(req, res) {
       await client.query(`
         INSERT INTO bar_tabs (id, tab_number, member_id, customer_name, table_number, status, discount_percent)
         VALUES ($1, $2, $3, $4, $5, 'OPEN', $6)
-      `, [activeTabId, tabNum, memberId || null, displayName, tableNumber || 'Counter', discountPercent]);
+      `, [activeTabId, tabNum, memberId || null, displayName, targetTable, discountPercent]);
     }
 
     // Insert order line items
@@ -191,3 +217,203 @@ export async function settleTab(req, res) {
     return res.status(500).json({ error: 'Failed to settle bar tab.' });
   }
 }
+
+/**
+ * Ensure bar_expenses table exists
+ */
+async function ensureBarExpensesTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS bar_expenses (
+      id VARCHAR(36) PRIMARY KEY,
+      expense_date VARCHAR(20) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      category VARCHAR(100) DEFAULT 'Inventory',
+      amount NUMERIC(10,2) NOT NULL,
+      notes TEXT,
+      created_by VARCHAR(255),
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    );
+    ALTER TABLE bar_expenses ADD COLUMN IF NOT EXISTS title VARCHAR(255);
+    ALTER TABLE bar_expenses ADD COLUMN IF NOT EXISTS category VARCHAR(100) DEFAULT 'Inventory';
+    ALTER TABLE bar_expenses ADD COLUMN IF NOT EXISTS notes TEXT;
+    ALTER TABLE bar_expenses ADD COLUMN IF NOT EXISTS created_by VARCHAR(255);
+  `);
+}
+
+/**
+ * Get Bar Expenses (filterable by date or per-day summary)
+ */
+export async function getBarExpenses(req, res) {
+  try {
+    await ensureBarExpensesTable();
+    const { date } = req.query;
+
+    let filterSql = '';
+    const params = [];
+    if (date) {
+      filterSql = ' WHERE expense_date = $1 ';
+      params.push(date);
+    }
+
+    const expenses = await query(`
+      SELECT id, expense_date AS "expenseDate", title, category, amount, notes, created_by AS "createdBy", created_at AS "createdAt"
+      FROM bar_expenses
+      ${filterSql}
+      ORDER BY expense_date DESC, created_at DESC
+    `, params);
+
+    // Group expenses by date for per-day breakdown
+    const perDayRows = await query(`
+      SELECT expense_date AS "expenseDate", SUM(amount) AS "totalExpense", COUNT(id) AS "itemCount"
+      FROM bar_expenses
+      GROUP BY expense_date
+      ORDER BY expense_date DESC
+    `);
+
+    // Fetch settled bar sales revenue per date dynamically
+    const salesByDateRows = await query(`
+      SELECT 
+        COALESCE(TO_CHAR(settled_at, 'YYYY-MM-DD'), TO_CHAR(opened_at, 'YYYY-MM-DD')) AS "date",
+        SUM(final_amount) AS "totalSales"
+      FROM bar_tabs
+      WHERE status = 'SETTLED'
+      GROUP BY 1
+    `);
+
+    const salesMap = {};
+    for (const row of salesByDateRows) {
+      if (row.date) {
+        salesMap[row.date] = parseFloat(row.totalSales || 0);
+      }
+    }
+
+    // Today's expense & sales metrics
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayExpenseRows = await query(`
+      SELECT SUM(amount) AS "todayTotal"
+      FROM bar_expenses
+      WHERE expense_date = $1
+    `, [todayStr]);
+
+    const todaySalesRows = await query(`
+      SELECT SUM(final_amount) AS "todaySales"
+      FROM bar_tabs
+      WHERE status = 'SETTLED' AND (
+        TO_CHAR(settled_at, 'YYYY-MM-DD') = $1 OR 
+        (settled_at IS NULL AND TO_CHAR(opened_at, 'YYYY-MM-DD') = $1)
+      )
+    `, [todayStr]);
+
+    const todayExpense = parseFloat(todayExpenseRows[0]?.todayTotal || 0);
+    const todaySales = parseFloat(todaySalesRows[0]?.todaySales || 0);
+    const todayNet = todaySales - todayExpense;
+
+    const formattedExpenses = expenses.map(e => ({
+      ...e,
+      amount: parseFloat(e.amount || 0)
+    }));
+
+    // Collect all dates from expenses and sales for complete per-day summary
+    const allDatesSet = new Set([
+      ...perDayRows.map(r => r.expenseDate),
+      ...Object.keys(salesMap)
+    ]);
+    const allDates = Array.from(allDatesSet).sort().reverse();
+
+    const expenseMap = {};
+    const countMap = {};
+    for (const r of perDayRows) {
+      expenseMap[r.expenseDate] = parseFloat(r.totalExpense || 0);
+      countMap[r.expenseDate] = parseInt(r.itemCount || 0, 10);
+    }
+
+    const perDaySummary = allDates.map(dateStr => {
+      const exp = expenseMap[dateStr] || 0;
+      const sales = salesMap[dateStr] || 0;
+      return {
+        expenseDate: dateStr,
+        totalExpense: exp,
+        salesRevenue: sales,
+        netProfit: sales - exp,
+        itemCount: countMap[dateStr] || 0
+      };
+    });
+
+    return res.json({
+      expenses: formattedExpenses,
+      perDaySummary,
+      todayTotalExpense: todayExpense,
+      todaySalesRevenue: todaySales,
+      todayNetProfit: todayNet,
+      selectedDate: date || null
+    });
+  } catch (error) {
+    console.error('getBarExpenses Error:', error);
+    return res.status(500).json({ error: 'Failed to fetch bar expenses.' });
+  }
+}
+
+/**
+ * Add a Bar Expense
+ */
+export async function addBarExpense(req, res) {
+  try {
+    await ensureBarExpensesTable();
+    const { title, amount, category, expenseDate, notes } = req.body;
+
+    if (!title || amount === undefined || amount === null) {
+      return res.status(400).json({ error: 'Title and amount are required.' });
+    }
+
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return res.status(400).json({ error: 'Amount must be a positive number.' });
+    }
+
+    const id = `exp-${Date.now()}`;
+    const dateToUse = expenseDate || new Date().toISOString().split('T')[0];
+    const categoryToUse = category || 'Inventory';
+    const creator = req.user?.name || 'Bar Staff';
+
+    await query(`
+      INSERT INTO bar_expenses (id, expense_date, title, category, amount, notes, created_by)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [id, dateToUse, title.trim(), categoryToUse, numAmount, notes ? notes.trim() : '', creator]);
+
+    return res.status(201).json({
+      message: 'Bar expense recorded successfully.',
+      expense: {
+        id,
+        expenseDate: dateToUse,
+        title: title.trim(),
+        category: categoryToUse,
+        amount: numAmount,
+        notes: notes ? notes.trim() : '',
+        createdBy: creator
+      }
+    });
+  } catch (error) {
+    console.error('addBarExpense Error:', error);
+    return res.status(500).json({ error: 'Failed to record bar expense.' });
+  }
+}
+
+/**
+ * Delete a Bar Expense
+ */
+export async function deleteBarExpense(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await query('DELETE FROM bar_expenses WHERE id = $1 RETURNING id', [id]);
+    
+    if (result.length === 0) {
+      return res.status(404).json({ error: 'Bar expense record not found.' });
+    }
+
+    return res.json({ message: 'Bar expense deleted successfully.', id });
+  } catch (error) {
+    console.error('deleteBarExpense Error:', error);
+    return res.status(500).json({ error: 'Failed to delete bar expense.' });
+  }
+}
+

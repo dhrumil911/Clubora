@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Coffee, Plus, CheckCircle, CreditCard, DollarSign, QrCode, Tag, AlertCircle, X, ShieldAlert } from 'lucide-react';
+import DailyBarExpenseTracker from '../components/DailyBarExpenseTracker';
+import { 
+  Coffee, Plus, CheckCircle, CreditCard, DollarSign, QrCode, Tag, 
+  AlertCircle, X, ShieldAlert, Receipt, Utensils, PackageCheck, AlertOctagon, CheckCircle2, MapPin
+} from 'lucide-react';
 
-export default function BarPOSPage() {
+const CAFETERIA_TABLES = [
+  'Table 1', 'Table 2', 'Table 3', 'Table 4', 
+  'Table 5', 'Table 6', 'Patio Table A', 'Patio Table B', 
+  'Bar Counter'
+];
+
+export default function BarPOSPage({ user }) {
+  const [activeTabMode, setActiveTabMode] = useState('pos'); // 'pos' | 'expenses'
   const [menuItems, setMenuItems] = useState([]);
   const [openTabs, setOpenTabs] = useState([]);
   const [members, setMembers] = useState([]);
@@ -12,7 +23,9 @@ export default function BarPOSPage() {
   const [selectedTab, setSelectedTab] = useState(null);
   const [orderCart, setOrderCart] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState('');
-  const [tableNumber, setTableNumber] = useState('');
+  const [tableNumber, setTableNumber] = useState('Table 1');
+  const [orderType, setOrderType] = useState('DINE_IN'); // 'DINE_IN' | 'TAKEAWAY'
+  const [formError, setFormError] = useState('');
 
   // Payment Settlement Modal
   const [settleModalTab, setSettleModalTab] = useState(null);
@@ -40,6 +53,16 @@ export default function BarPOSPage() {
     }
   };
 
+  // Helper to check if a table is currently occupied by an open tab
+  const getOccupyingTab = (tableName) => {
+    if (!tableName) return null;
+    return openTabs.find(t => 
+      t.tableNumber && 
+      t.tableNumber.toLowerCase().trim() === tableName.toLowerCase().trim() &&
+      (!selectedTab || t.id !== selectedTab.id)
+    );
+  };
+
   const addToOrderCart = (item) => {
     const existing = orderCart.find(c => c.barItemId === item.id);
     if (existing) {
@@ -50,20 +73,34 @@ export default function BarPOSPage() {
   };
 
   const handleSaveTabOrder = async () => {
+    setFormError('');
     if (orderCart.length === 0) return;
+
+    const finalTable = orderType === 'TAKEAWAY' ? 'Packed / Takeaway (Parcel)' : tableNumber;
+
+    // Check Table Occupancy before submitting
+    if (orderType === 'DINE_IN') {
+      const occupiedBy = getOccupyingTab(finalTable);
+      if (occupiedBy) {
+        setFormError(`${finalTable} is currently IN USE by ${occupiedBy.customerName} (${occupiedBy.tabNumber}). Another customer cannot be seated here until settled.`);
+        return;
+      }
+    }
+
     try {
       await api.post('/bar/tabs', {
         tabId: selectedTab ? selectedTab.id : null,
         memberId: selectedMemberId || null,
-        tableNumber: tableNumber || 'Counter Bar',
+        tableNumber: finalTable,
         items: orderCart
       });
       setOrderCart([]);
       setSelectedTab(null);
-      setTableNumber('');
+      setTableNumber('Table 1');
+      setFormError('');
       fetchBarData();
     } catch (err) {
-      alert(err.response?.data?.error || 'Failed to update tab.');
+      setFormError(err.response?.data?.error || 'Failed to update tab.');
     }
   };
 
@@ -84,17 +121,142 @@ export default function BarPOSPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       
-      {/* Header */}
+      {/* Header & Sub-Nav Switcher */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Coffee className="w-7 h-7 text-sky-600" /> Bar & Cafeteria POS
+            <Coffee className="w-7 h-7 text-amber-500" /> Bar & Cafeteria Staff Portal
           </h1>
           <p className="text-slate-500 text-sm mt-1">
-            Fast post-match ordering, running tab manager, automatic tier discounts, and UPI/Cash/Card settlements.
+            Manage cafeteria orders, dine-in table status, takeaway packaging, and per-day bar expenses.
           </p>
         </div>
+
+        {/* View Mode Switcher */}
+        <div className="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 border border-slate-300">
+          <button
+            onClick={() => setActiveTabMode('pos')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+              activeTabMode === 'pos'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+            }`}
+          >
+            <Coffee className="w-4 h-4 text-amber-400" />
+            <span>Bar POS & Tables</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTabMode('expenses')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all ${
+              activeTabMode === 'expenses'
+                ? 'bg-slate-900 text-white shadow-md'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-300/60'
+            }`}
+          >
+            <Receipt className="w-4 h-4 text-amber-400" />
+            <span>Per-Day Bar Expenses</span>
+          </button>
+        </div>
       </div>
+
+      {activeTabMode === 'expenses' ? (
+        <DailyBarExpenseTracker userRole={user?.role} />
+      ) : (
+        <div className="space-y-8">
+          
+          {/* Cafeteria Table Occupancy & Packaging Status Floor Map */}
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <Utensils className="w-5 h-5 text-amber-500" /> Cafeteria Table Occupancy & Status Map
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Live table status indicator. Tables in use are blocked for other customers until settled.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 text-xs font-bold">
+                <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Empty / Available</span>
+                </span>
+
+                <span className="flex items-center gap-1.5 text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full border border-rose-200">
+                  <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                  <span>In Use / Occupied</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Table Floor Cards Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              {CAFETERIA_TABLES.map(tblName => {
+                const occTab = getOccupyingTab(tblName);
+                const isOccupied = !!occTab;
+
+                return (
+                  <div
+                    key={tblName}
+                    className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all ${
+                      isOccupied 
+                        ? 'bg-rose-50/80 border-rose-200 shadow-sm' 
+                        : 'bg-slate-50 border-slate-200 hover:border-sky-400'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-extrabold text-xs text-slate-900 flex items-center gap-1">
+                          <MapPin className={`w-3.5 h-3.5 ${isOccupied ? 'text-rose-500' : 'text-slate-400'}`} />
+                          {tblName}
+                        </span>
+                        <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                          isOccupied 
+                            ? 'bg-rose-600 text-white' 
+                            : 'bg-emerald-100 text-emerald-800'
+                        }`}>
+                          {isOccupied ? 'In Use' : 'Empty'}
+                        </span>
+                      </div>
+
+                      {isOccupied ? (
+                        <div className="text-[11px] text-slate-700 space-y-0.5 mt-2">
+                          <div className="font-bold truncate">{occTab.customerName}</div>
+                          <div className="text-[10px] text-slate-500 font-mono">{occTab.tabNumber}</div>
+                          <div className="font-extrabold text-emerald-600 text-xs">${occTab.finalAmount.toFixed(2)}</div>
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-slate-400 italic mt-2">Available for customers</div>
+                      )}
+                    </div>
+
+                    <div className="mt-3 pt-2 border-t border-slate-200/80">
+                      {isOccupied ? (
+                        <button
+                          onClick={() => setSettleModalTab(occTab)}
+                          className="w-full py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] rounded-xl transition shadow-xs"
+                        >
+                          Settle & Free Table
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setOrderType('DINE_IN');
+                            setTableNumber(tblName);
+                          }}
+                          className="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[10px] rounded-xl transition"
+                        >
+                          + Assign Order
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -195,8 +357,8 @@ export default function BarPOSPage() {
 
         {/* Current Order Builder */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm sticky top-24">
-            <h3 className="text-lg font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
+          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm sticky top-24 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
               <span>{selectedTab ? `Adding to ${selectedTab.tabNumber}` : 'New Bar Order / Tab'}</span>
               {selectedTab && (
                 <button onClick={() => setSelectedTab(null)} className="text-xs text-rose-600 font-semibold">
@@ -205,8 +367,53 @@ export default function BarPOSPage() {
               )}
             </h3>
 
+            {formError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-start gap-2 animate-in fade-in">
+                <AlertOctagon className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+                <span className="font-medium">{formError}</span>
+              </div>
+            )}
+
+            {/* Order Type Toggle: Dine-in vs Takeaway (Empty vs Packed) */}
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">Dining & Packaging Type</label>
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrderType('DINE_IN');
+                    setFormError('');
+                  }}
+                  className={`py-2 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                    orderType === 'DINE_IN'
+                      ? 'bg-slate-900 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Utensils className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Dine-In (Table)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrderType('TAKEAWAY');
+                    setFormError('');
+                  }}
+                  className={`py-2 px-3 rounded-lg text-xs font-extrabold flex items-center justify-center gap-1.5 transition ${
+                    orderType === 'TAKEAWAY'
+                      ? 'bg-amber-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <PackageCheck className="w-3.5 h-3.5 text-white" />
+                  <span>Packed / Takeaway</span>
+                </button>
+              </div>
+            </div>
+
             {/* Select Member for Discount */}
-            <div className="space-y-3 mb-4">
+            <div className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">Select Member (Automatic Discount)</label>
                 <select
@@ -214,7 +421,7 @@ export default function BarPOSPage() {
                   onChange={(e) => setSelectedMemberId(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-sky-500"
                 >
-                  <option value="">Guest (0% Discount)</option>
+                  <option value="">Guest Customer (0% Discount)</option>
                   {members.map(m => (
                     <option key={m.id} value={m.id}>
                       {m.name} ({m.tier?.name} - {m.tier?.barDiscountPercent}% Off)
@@ -223,16 +430,34 @@ export default function BarPOSPage() {
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Table Number / Location</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Table 4 Patio, Bar Counter"
-                  value={tableNumber}
-                  onChange={(e) => setTableNumber(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-sky-500"
-                />
-              </div>
+              {/* Table Selection (Shown for Dine-In) */}
+              {orderType === 'DINE_IN' ? (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Select Cafeteria Table</label>
+                  <select
+                    value={tableNumber}
+                    onChange={(e) => {
+                      setTableNumber(e.target.value);
+                      setFormError('');
+                    }}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-sky-500"
+                  >
+                    {CAFETERIA_TABLES.map(tbl => {
+                      const occ = getOccupyingTab(tbl);
+                      return (
+                        <option key={tbl} value={tbl} disabled={!!occ}>
+                          {tbl} {occ ? `🔴 (IN USE by ${occ.customerName})` : '🟢 (Empty / Available)'}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </div>
+              ) : (
+                <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-xl text-xs text-amber-800 flex items-center gap-2">
+                  <PackageCheck className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <span>Order marked as <strong>Packed / Parcel Takeaway</strong>. No dining table assigned.</span>
+                </div>
+              )}
             </div>
 
             {memberDiscountPercent > 0 && (
@@ -344,6 +569,9 @@ export default function BarPOSPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
         </div>
       )}
 
