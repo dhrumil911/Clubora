@@ -1,91 +1,146 @@
-# 🏆 Clubora - Champions Sports Club Management System
+# 🏆 Clubora — Next-Gen Sports Club Operating System & Management Platform
 
-**Clubora** is an end-to-end, multi-tenant digital management platform for sports clubs. It unifies member tiers, court booking engine, gear shop inventory POS, cafeteria bar POS, per-day bar expense accounting, visitor CRM pipeline, staff shift scheduling, and executive owner analytics into a single interface.
-
----
-
-## 🚀 Key Modules & Feature Highlights
-
-### 1. 🔑 Multi-Role Access & Authentication
-- **Unified Portal** (`/login`) & **Dedicated Role Portals**:
-  - 👑 **Club Owner Portal** (`/auth/owner/login`): Executive financial command center, staff shift manager, tax reports & daily bar profit tracking.
-  - 🛡️ **Front Desk Staff** (`/auth/front-desk/login`): Member directory, court scheduler, visitor CRM, quote generator.
-  - 🍹 **Bar Staff** (`/auth/bar/login`): Cafeteria bar order tabs, live table occupancy map, dine-in vs packed parcel toggle, daily bar expense logging & net margin calculator.
-  - 🛍️ **Shop Staff** (`/auth/shop/login`): Pro shop gear inventory POS, stock transaction history, low-stock alerts & restock controls.
-  - 🏆 **Club Member Portal** (`/auth/member/login`): Court booking engine, sofa gear ordering, cafeteria bar special member rates.
-
-### 2. 🍹 Bar & Cafeteria POS + Per-Day Expense Engine
-- **Live Cafeteria Tab Manager**: Create running tabs for dine-in tables or bar counter orders with automatic tier discount application (Gold 20% OFF, Silver 10% OFF).
-- **Cafeteria Table Occupancy Map**: Live floor map with visual indicators for occupied (in-use) vs empty tables. Prevents assigning already occupied tables.
-- **Empty vs Packed (Takeaway) Toggle**: One-click packaging toggle for dine-in table vs parcel takeaway.
-- **Dynamic Per-Day Bar Expense Tracker**:
-  - Log daily bar operating expenses (ingredients, beverages, supplies, utilities).
-  - Dynamic live metrics: **Today's Bar Sales**, **Today's Expenses**, and **Net Profit/Loss**.
-  - Accessible on both **Bar Staff Page** and **Owner Executive Command Center**.
-
-### 3. 🎾 Court Booking & Facilities Engine
-- Staggered court scheduling for Tennis, Cricket Nets, Padel, and Badminton.
-- Anti-double booking validation, player count limits, and social play booking options.
-
-### 4. 🛍️ Pro Shop & Inventory Management
-- Real-time shelf inventory POS pulling from unified product stock.
-- Instant low-stock alerts and restock controls.
-
-### 5. 👥 Member Tiers & Visitor CRM Engine
-- Gold, Silver, Junior, and Walk-in tiers with automated court, shop, and bar discount rules.
-- Visitor lead pipeline, quote proposal generator, and 1-click lead conversion.
-
-### 6. 📅 Staff Shifts, Leaves & Invoicing
-- Weekly shift roster management and leave request approvals.
-- Corporate invoicing engine with overdue tracking and GST/Tax export reports.
+**Clubora** is an end-to-end, enterprise-grade Sports Club & Facility Management System designed for racquet clubs, tennis/padel centers, multi-sport complexes, and athletic facilities. It unifies Court Scheduling, Pro Shop Inventory POS, Bar & Cafeteria POS, CRM Lead Conversion, Staff Scheduling, Corporate Invoicing, and Executive Financial Analytics into a seamless platform.
 
 ---
 
-## 🔑 Demo Account Credentials
+## 🌟 Key Features & Core Modules
 
-| Portal / Role | Email | Password | Access Path |
-| :--- | :--- | :--- | :--- |
-| 👑 **Club Owner** | `owner@clubora.com` | `Clubora@2026` | `/auth/owner/login` |
-| 🛡️ **Front Desk Staff** | `frontdesk@clubora.com` | `Frontdesk@2026` | `/auth/front-desk/login` |
-| 🍹 **Bar Staff** | `bar@clubora.com` | `Bar@2026` | `/auth/bar/login` |
-| 🛍️ **Shop Staff** | `shop@clubora.com` | `Shop@2026` | `/auth/shop/login` |
-| 🏆 **Club Member** | `david.gold@example.com` | `password123` | `/auth/member/login` |
+### 👑 1. Executive Financial Analytics & Control (Club Owner)
+* **Real-time Aggregated Metrics**: Financial overview across Courts, Gear Shop POS, Bar & Cafeteria, and Corporate Receivables.
+* **Revenue Stream Distribution**: Interactive breakdowns showing percentage shares for court bookings, retail shop POS, bar tabs, and active subscriptions.
+* **Corporate Invoices & Receivables**: Generate, issue, and track corporate client invoices with automated status updates (`PENDING`, `PAID`, `OVERDUE`).
+* **PDF Financial Report Export**: Download executive financial summaries in PDF format with a single click.
+
+### 🎾 2. Court Booking & Slot Scheduler Engine
+* **Interactive Slot Matrix**: Real-time slot booking across Tennis, Padel, Badminton, and Pickleball courts.
+* **Social Play & Matchmaking**: Option to mark court bookings as Social Play to allow player matching.
+* **Dynamic Tier Discounts**: Automated discount application based on member tier (Platinum, Gold, Silver).
+* **Instant Check-in & Cancellation**: Front desk management tools for member check-in and booking cancellations.
+
+### 🛍️ 3. Pro Shop POS & Inventory Management Workflow
+* **Role-Separated Workflows**: 
+  * **Members**: Browse items, view tier-discounted pricing, validate stock availability, add to cart, checkout via Razorpay online or Cash, and download PDF receipts.
+  * **Shop Staff**: Operational Stock Dashboard with status badges (`IN STOCK`, `LOW STOCK`, `OUT OF STOCK`), direct physical stock addition, and Inventory Purchase Requests to Owner.
+* **Owner Inventory Request Approval Lifecycle**:
+  * `PENDING` $\rightarrow$ `APPROVED` / `REJECTED` $\rightarrow$ `ORDERED` $\rightarrow$ `RECEIVED`
+  * Stock increases in the database **only upon physical delivery receipt**.
+* **Single Shared Inventory Pool**: Ensures live synchronization between online member purchases and counter POS sales.
+
+### ☕ 4. Bar & Cafeteria POS
+* **Member Open Tabs**: Open, update, and manage cafeteria tabs for members and guests.
+* **Tab Settlement**: Cash, Card, or Online payment tab settlement with tier discount application.
+* **Daily Bar Expense Tracking**: Log operational cafe expenses directly into the financial ledger.
+
+### 🎯 5. CRM Lead Conversion & Quotation Engine
+* **Visual Lead Funnel**: Track lead conversion pipeline (`NEW` $\rightarrow$ `CONTACTED` $\rightarrow$ `TRIAL_BOOKED` $\rightarrow$ `CONVERTED`).
+* **Custom Quotation Builder**: Generate custom membership & court package quotes for prospective leads.
+
+### 📅 6. Staff Roster & Leave Management
+* **Shift Scheduling**: Assign and manage shifts across Front Desk, Shop POS, and Bar staff.
+* **Leave Request Portal**: Staff leave submission with Owner review & approval workflow.
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React (Vite), React Router v6, Tailwind CSS, Lucide React Icons, Axios.
-- **Backend**: Node.js, Express.js, PostgreSQL (`pg` pool with parameterized SQL queries & ACID transactions), JWT, bcryptjs.
-- **Database**: PostgreSQL (Auto-migrated DDL schema & seed scripts).
+| Layer | Technologies Used |
+| :--- | :--- |
+| **Frontend** | React 18, Vite, Tailwind CSS, Lucide React Icons, Recharts, React Router v6, Axios, jsPDF, html2canvas |
+| **Backend** | Node.js, Express.js (ES Modules), PostgreSQL (`pg`), JWT (`jsonwebtoken`), Bcrypt.js, Razorpay SDK |
+| **Database** | PostgreSQL (Relational DB with auto-migration schema support) |
+| **Styling** | Adaptive Dark & Light Theme with Tailwind CSS |
 
 ---
 
-## ⚙️ Installation & Local Setup
+## 📁 Repository Structure
 
-### 1. Database Initialization
-Make sure PostgreSQL is running, then run the database migration and seed script:
-```bash
-cd backend
-node database/seed.js
+```
+Clubora/
+├── backend/                  # Express.js REST API & Database Control
+│   ├── database/             # PostgreSQL Schema & Seed Scripts
+│   │   ├── schema.sql        # Database Table Definitions
+│   │   └── seed.js          # Demo Data Seeder
+│   ├── src/
+│   │   ├── config/           # Database Connection Pool (`db.js`)
+│   │   ├── controllers/      # API Business Logic Handlers
+│   │   ├── middleware/       # JWT Auth & Role Authorization
+│   │   └── server.js         # Express Server Entrance
+│   └── package.json
+│
+├── frontend/                 # React SPA (Vite + Tailwind CSS)
+│   ├── src/
+│   │   ├── components/       # UI Components (Navbar, Modals, Trackers)
+│   │   ├── context/          # ThemeContext & State Management
+│   │   ├── pages/            # Feature & Module Views
+│   │   │   ├── auth/         # Login & Registration Pages
+│   │   │   └── dashboards/   # Role-based Dashboards (Owner, Front Desk, Staff, Member)
+│   │   ├── utils/            # PDF Generator Utilities
+│   │   ├── api.js            # Axios Interceptor & Base URL Config
+│   │   ├── App.jsx           # Client-side Router & Guard Routes
+│   │   └── main.jsx          # React Entrance
+│   └── package.json
+│
+└── README.md                 # Documentation
 ```
 
-### 2. Backend Server
+---
+
+## 🚀 Quick Start & Installation
+
+### Prerequisites
+* **Node.js** (v18.x or higher)
+* **PostgreSQL** (v14.x or higher)
+
+---
+
+### 1. Database Setup
+1. Create a PostgreSQL database named `Clubora`:
+   ```sql
+   CREATE DATABASE "Clubora";
+   ```
+2. Configure database credentials in `backend/.env`:
+   ```env
+   PORT=5000
+   JWT_SECRET=clubora_secret_jwt_key_2026
+   PGHOST=localhost
+   PGPORT=5432
+   PGDATABASE=Clubora
+   PGUSER=postgres
+   PGPASSWORD=your_postgres_password
+   ```
+
+---
+
+### 2. Backend Setup
 ```bash
 cd backend
 npm install
-npm run dev
-# Server running on http://localhost:5000
+npm run db:migrate   # Seed database schema & demo data
+npm run dev          # Start backend server on http://localhost:5000
 ```
 
-### 3. Frontend Web App
+---
+
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
-npm run dev
-# App running on http://localhost:5173
+npm run dev          # Start Vite dev server on http://localhost:3000
 ```
 
 ---
 
-© 2026 Clubora Sports Management System. All rights reserved.
+## 👥 Demo Access Credentials
+
+| Role | Email | Password | Access Rights |
+| :--- | :--- | :--- | :--- |
+| **Club Owner** | `owner@clubora.com` | `Clubora@2026` | Full Access: Financials, Reports, Staff Roster, Invoices, Approvals |
+| **Front Desk** | `frontdesk@clubora.com` | `Frontdesk@2026` | Court Scheduler, Member Management, CRM Leads & Quotes |
+| **Bar / Shop Staff** | `barshop@clubora.com` | `Barshop@2026` | Gear Inventory POS, Stock Addition, Request Stock, Bar Cafeteria POS |
+| **Club Member** | `member@clubora.com` | `Member@2026` | Court Slot Booking, Gear Shop Checkout, Bar Tabs, Membership Plans |
+
+---
+
+## 📄 License
+This project is proprietary software for **Clubora Sports Club Management System**. All rights reserved.
