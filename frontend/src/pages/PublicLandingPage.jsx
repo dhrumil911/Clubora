@@ -3,10 +3,15 @@ import { Link } from 'react-router-dom';
 import api from '../api';
 import { 
   Trophy, ShieldCheck, Calendar, ShoppingBag, Coffee, Users, Target, LayoutDashboard, 
-  CheckCircle2, Star, ArrowRight, Shield, Award, Zap, Phone, Mail, MapPin, Clock, Info, Crown
+  CheckCircle2, Star, ArrowRight, Shield, Award, Zap, Phone, Mail, MapPin, Clock, Info, Crown, Sun, Moon
 } from 'lucide-react';
+import CluboraLogoIcon from '../components/CluboraLogoIcon';
+import { useTheme } from '../context/ThemeContext';
+import clubDayImg from '../assets/club-day.jpg';
+import clubNightImg from '../assets/club-night.jpg';
 
 export default function PublicLandingPage({ user }) {
+  const { theme } = useTheme();
   const [tiers, setTiers] = useState([]);
   const [selectedPlanName, setSelectedPlanName] = useState('Gold');
 
@@ -23,44 +28,64 @@ export default function PublicLandingPage({ user }) {
     }
   };
 
+  const isLight = theme === 'light';
+  const heroBgImage = isLight ? clubDayImg : clubNightImg;
+
   return (
-    <div className="bg-zinc-950 text-zinc-100 min-h-screen font-sans">
+    <div className={isLight ? "bg-slate-100 text-slate-900 min-h-screen font-sans transition-colors duration-300" : "bg-zinc-950 text-zinc-100 min-h-screen font-sans transition-colors duration-300"}>
       
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 bg-zinc-900/90 text-lime-400 border border-lime-400/30 px-4 py-1.5 rounded-full text-xs font-bold mb-6 backdrop-blur-sm shadow-lg shadow-lime-400/5">
-          <Trophy className="w-4 h-4 text-lime-400" />
-          <span>The Champions Club OS & Management Platform</span>
-        </div>
+      {/* 1st Page / Hero Section with Dynamic Light/Dark Theme Background Image */}
+      <section className="hero-section-bg relative min-h-[85vh] flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        
+        {/* Full-Cover Background Hero Image */}
+        <img 
+          src={heroBgImage} 
+          alt="Clubora Padel Court Facility"
+          className="hero-bg-img absolute inset-0 w-full h-full object-cover object-center z-0 transition-opacity duration-700"
+        />
 
-        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
-          The Digital Backbone of Your <span className="text-lime-400 underline decoration-lime-400/40 underline-offset-8">Sports Club</span>
-        </h1>
+        {/* Semi-transparent Theme Overlay for optimal contrast & image visibility */}
+        <div className={`hero-overlay-bg absolute inset-0 z-10 transition-colors duration-500 ${
+          isLight 
+            ? 'bg-gradient-to-b from-slate-950/45 via-slate-950/35 to-slate-950/60 backdrop-blur-[1px]' 
+            : 'bg-gradient-to-b from-zinc-950/40 via-zinc-950/25 to-zinc-950/60'
+        }`} />
 
-        <p className="mt-6 text-zinc-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-          Clubora solves the operational headaches of modern sports clubs. Unifying member tiers, staggered court bookings, gear shop inventory, post-match bar POS, staff shifts, and executive owner analytics in one platform.
-        </p>
+        <div className="relative z-20 max-w-[1500px] mx-auto text-center space-y-6">
 
-        {/* Hero CTA Buttons */}
-        <div className="mt-8 flex flex-wrap justify-center items-center gap-4">
-          <Link
-            to="/auth/member/signup"
-            className="px-8 py-4 bg-lime-400 hover:bg-lime-300 text-zinc-950 font-black rounded-2xl text-sm shadow-xl shadow-lime-400/20 transition transform hover:-translate-y-0.5 flex items-center gap-2.5"
-          >
-            <span>Become a Member</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <Link
-            to="/bookings"
-            className="px-8 py-4 bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-bold rounded-2xl text-sm border border-zinc-800 transition"
-          >
-            Book a Court Session
-          </Link>
+          <h1 className="hero-title-white text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-tight drop-shadow-[0_3px_16px_rgba(0,0,0,0.95)]">
+            The Digital Backbone of Your <span className="hero-text-lime text-lime-400 underline decoration-lime-400/60 underline-offset-8">Sports Club</span>
+          </h1>
+
+          <p className="hero-text-white text-white sm:text-zinc-100 text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)]">
+            Clubora solves the operational headaches of modern sports clubs. Unifying member tiers, staggered court bookings, gear shop inventory, post-match bar POS, staff shifts, and executive owner analytics in one platform.
+          </p>
+
+          {/* Hero CTA Buttons */}
+          <div className="pt-4 flex flex-wrap justify-center items-center gap-4">
+            <Link
+              to="/auth/member/signup"
+              className="px-8 py-4 bg-lime-400 hover:bg-lime-300 text-zinc-950 font-black rounded-2xl text-sm sm:text-base shadow-2xl shadow-lime-400/40 transition transform hover:-translate-y-0.5 flex items-center gap-2.5 cursor-pointer"
+            >
+              <span>Become a Member</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/bookings"
+              className={isLight
+                ? "px-8 py-4 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-2xl text-sm sm:text-base border border-slate-200 shadow-2xl transition cursor-pointer"
+                : "px-8 py-4 bg-zinc-900/90 hover:bg-zinc-900 text-white font-bold rounded-2xl text-sm sm:text-base border border-zinc-700/80 backdrop-blur-md shadow-2xl transition cursor-pointer"
+              }
+            >
+              Book a Court Session
+            </Link>
+          </div>
+
         </div>
       </section>
 
       {/* Feature Cards Section */}
-      <section className="py-16 px-4 max-w-7xl mx-auto border-t border-zinc-800/80">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-[1500px] mx-auto border-t border-zinc-800/80">
         <div className="text-center mb-12">
           <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
             Unified Modules for Club Operations
@@ -137,7 +162,7 @@ export default function PublicLandingPage({ user }) {
 
       {/* About Section */}
       <section id="about" className="py-16 bg-zinc-900/60 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             
             <div className="space-y-4">
@@ -192,8 +217,8 @@ export default function PublicLandingPage({ user }) {
       </section>
 
       {/* Role Access Portals Section */}
-      <section className="py-12 bg-zinc-950 border-y border-zinc-800 px-4">
-        <div className="max-w-6xl mx-auto text-center space-y-6">
+      <section className="py-12 bg-zinc-950 border-y border-zinc-800 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1500px] mx-auto text-center space-y-6">
           <h2 className="text-xl sm:text-2xl font-black text-white">Staff & Portal Access</h2>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <Link to="/auth/member/login" className="p-4 bg-zinc-900 border border-zinc-800 hover:border-lime-400/80 rounded-2xl flex flex-col items-center gap-2 group transition">
@@ -226,7 +251,7 @@ export default function PublicLandingPage({ user }) {
 
       {/* Membership Plans Section */}
       <section id="membership" className="py-16 bg-zinc-900/60 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-4xl font-black text-white">Membership Plans & Tiers</h2>
             <p className="text-zinc-400 text-xs sm:text-sm mt-2">Select the membership plan that best suits your play frequency.</p>
@@ -264,7 +289,7 @@ export default function PublicLandingPage({ user }) {
                         </span>
                       </div>
 
-                      <div className="text-4xl font-black text-amber-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <div className="text-4xl font-black text-amber-400 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                       <p className="text-xs text-zinc-300 mt-2 font-medium">{t.description || 'All-access flagship membership with free court sessions and top discounts.'}</p>
 
                       <div className="mt-6 space-y-3 text-xs text-zinc-200 border-t border-amber-500/20 pt-4">
@@ -321,7 +346,7 @@ export default function PublicLandingPage({ user }) {
                         </span>
                       </div>
 
-                      <div className="text-4xl font-black text-zinc-200 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <div className="text-4xl font-black text-zinc-200 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                       <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Standard membership with 50% court discount and gear perks.'}</p>
 
                       <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-zinc-800 pt-4">
@@ -378,7 +403,7 @@ export default function PublicLandingPage({ user }) {
                       </span>
                     </div>
 
-                    <div className="text-4xl font-black text-sky-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                    <div className="text-4xl font-black text-sky-400 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                     <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Youth & junior membership (under-18) for developing young athletes.'}</p>
 
                     <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-sky-500/20 pt-4">
@@ -412,11 +437,9 @@ export default function PublicLandingPage({ user }) {
 
       {/* Footer */}
       <footer className="py-12 bg-zinc-950 border-t border-zinc-800 text-xs text-zinc-500">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-lime-400 text-zinc-950 font-black flex items-center justify-center text-sm">
-              C
-            </div>
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2.5">
+            <CluboraLogoIcon className="h-8 w-auto" />
             <span className="font-black text-white text-sm">CLUBORA</span>
             <span className="text-zinc-600">| Champions Club OS</span>
           </div>

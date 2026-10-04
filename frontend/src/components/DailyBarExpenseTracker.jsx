@@ -23,7 +23,7 @@ const CATEGORY_COLORS = {
   Other: 'bg-slate-500/10 text-slate-400 border-slate-500/30'
 };
 
-export default function DailyBarExpenseTracker({ userRole }) {
+export default function DailyBarExpenseTracker({ userRole, isEmbedded = false }) {
   const getTodayStr = () => new Date().toISOString().split('T')[0];
   
   const [selectedDate, setSelectedDate] = useState(getTodayStr());
@@ -118,12 +118,12 @@ export default function DailyBarExpenseTracker({ userRole }) {
   const selectedDateTotal = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
 
   return (
-    <div className="space-y-6 text-white">
+    <div className={isEmbedded ? 'space-y-5 text-white' : 'space-y-6 text-white'}>
       
       {/* Header Banner */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl backdrop-blur-md">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+      <div className={isEmbedded ? 'owner-tab-actions flex justify-end' : 'bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl backdrop-blur-md'}>
+        <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${isEmbedded ? 'md:justify-end' : ''}`}>
+          {!isEmbedded && <div>
             <div className="flex items-center gap-2">
               <Coffee className="w-5 h-5 text-lime-400" />
               <span className="text-xs font-bold text-lime-400 uppercase tracking-wider">Per Day Bar Expenses & Dynamic Profitability</span>
@@ -132,7 +132,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
             <p className="text-xs text-zinc-400 mt-1 max-w-xl font-medium">
               Real-time daily bar & cafeteria operational costs, ingredient restocks, settled sales revenue, and live net profit margin calculation.
             </p>
-          </div>
+          </div>}
 
           <div className="flex items-center gap-3">
             <button
@@ -196,9 +196,9 @@ export default function DailyBarExpenseTracker({ userRole }) {
             </div>
 
             <div>
-              <label className="block font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Amount ($ / ₹)</label>
+              <label className="block font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Amount (₹)</label>
               <div className="relative">
-                <DollarSign className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" />
+                <span className="w-4 h-4 text-zinc-500 absolute left-3 top-2.5 font-bold">₹</span>
                 <input
                   type="number"
                   step="0.01"
@@ -276,7 +276,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
             <TrendingUp className="w-4 h-4 text-lime-400" />
           </div>
           <div className="text-2xl font-black text-lime-400 font-mono">
-            ${todaySalesRevenue.toFixed(2)}
+            ₹{todaySalesRevenue.toFixed(2)}
           </div>
           <div className="text-[11px] text-zinc-500 font-medium">Live Settled Bar Tabs</div>
         </div>
@@ -288,7 +288,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
             <TrendingDown className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-black text-rose-400 font-mono">
-            ${todayTotalExpense.toFixed(2)}
+            ₹{todayTotalExpense.toFixed(2)}
           </div>
           <div className="text-[11px] text-zinc-500 font-medium">Logged Operating Costs</div>
         </div>
@@ -300,7 +300,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
             {todayNetProfit >= 0 ? <TrendingUp className="w-4 h-4 text-lime-400" /> : <TrendingDown className="w-4 h-4 text-rose-400" />}
           </div>
           <div className={`text-2xl font-black font-mono ${todayNetProfit >= 0 ? 'text-lime-400' : 'text-rose-400'}`}>
-            ${todayNetProfit.toFixed(2)}
+            ₹{todayNetProfit.toFixed(2)}
           </div>
           <div className="text-[11px] text-zinc-500 font-medium">Sales - Expenses</div>
         </div>
@@ -312,7 +312,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
             <Calendar className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-black text-amber-400 font-mono">
-            ${selectedDateTotal.toFixed(2)}
+            ₹{selectedDateTotal.toFixed(2)}
           </div>
           <div className="text-[11px] text-zinc-500 font-medium">{expenses.length} item(s) logged</div>
         </div>
@@ -422,7 +422,7 @@ export default function DailyBarExpenseTracker({ userRole }) {
                       {exp.notes || '-'}
                     </td>
                     <td className="px-4 py-4 text-right font-mono font-black text-rose-400 text-sm">
-                      ${parseFloat(exp.amount).toFixed(2)}
+                      ₹{parseFloat(exp.amount).toFixed(2)}
                     </td>
                     <td className="px-4 py-4 text-center">
                       <button
@@ -480,15 +480,15 @@ export default function DailyBarExpenseTracker({ userRole }) {
                       {row.itemCount} item(s)
                     </td>
                     <td className="px-4 py-4 text-right font-mono font-black text-lime-400 text-sm">
-                      ${parseFloat(row.salesRevenue || 0).toFixed(2)}
+                      ₹{parseFloat(row.salesRevenue || 0).toFixed(2)}
                     </td>
                     <td className="px-4 py-4 text-right font-mono font-black text-rose-400 text-sm">
-                      ${parseFloat(row.totalExpense || 0).toFixed(2)}
+                      ₹{parseFloat(row.totalExpense || 0).toFixed(2)}
                     </td>
                     <td className={`px-4 py-4 text-right font-mono font-black text-sm ${
                       (row.netProfit || 0) >= 0 ? 'text-lime-400' : 'text-rose-400'
                     }`}>
-                      ${parseFloat(row.netProfit || 0).toFixed(2)}
+                      ₹{parseFloat(row.netProfit || 0).toFixed(2)}
                     </td>
                     <td className="px-4 py-4 text-center">
                       <button

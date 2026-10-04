@@ -77,7 +77,7 @@ export default function App() {
         <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans w-full">
         <Navbar user={user} onLogout={handleLogout} />
         
-        <main className="flex-1 bg-zinc-950 text-white w-full flex flex-col">
+        <main className="flex-1 bg-zinc-950 text-white w-full flex flex-col min-w-0 max-w-full overflow-x-hidden">
           <Routes>
             {/* Task 1: Public Landing Page */}
             <Route path="/" element={<PublicLandingPage user={user} />} />
@@ -214,6 +214,15 @@ export default function App() {
               path="/member"
               element={
                 <ProtectedRoute user={user} allowedRoles={['MEMBER', 'OWNER']}>
+                  <MemberDashboardPage user={user} />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/bar-cafe"
+              element={
+                <ProtectedRoute user={user} allowedRoles={['MEMBER', 'BAR_SHOP_STAFF', 'BAR_STAFF', 'BAR', 'SHOP_STAFF', 'SHOP', 'FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER']}>
                   <MemberDashboardPage user={user} />
                 </ProtectedRoute>
               }

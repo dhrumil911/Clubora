@@ -5,6 +5,7 @@ import {
   LogOut, ShieldCheck, ChevronDown, User, Shield, Lock, Award, Home, Sparkles, UserPlus, LogIn, Menu, X
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import CluboraLogoIcon from './CluboraLogoIcon';
 
 export default function Navbar({ user, onLogout }) {
   const location = useLocation();
@@ -82,68 +83,54 @@ export default function Navbar({ user, onLogout }) {
 
   return (
     <header className="bg-zinc-950/95 text-zinc-100 border-b border-zinc-800/80 sticky top-0 z-50 shadow-2xl backdrop-blur-md w-full">
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo & Brand */}
-          <Link to="/" className="flex items-center gap-2 sm:gap-3 group flex-shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-lime-400 to-lime-500 text-zinc-950 flex items-center justify-center font-black text-lg sm:text-xl shadow-lg shadow-lime-400/20 group-hover:scale-105 transition-transform">
-              C
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <span className="font-black text-base sm:text-xl tracking-wider text-white leading-none">
-                  CLUBORA
-                </span>
-                <span className="bg-lime-400/10 border border-lime-400/30 text-lime-400 text-[8px] sm:text-[9px] font-black px-1 sm:px-1.5 py-0.5 rounded tracking-widest uppercase">
-                  PRO
-                </span>
-              </div>
-              <span className="text-[8px] sm:text-[9px] font-bold text-zinc-400 tracking-widest uppercase">
-                Sports Club OS
-              </span>
-            </div>
+          <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group flex-shrink-0">
+            <CluboraLogoIcon className="h-9 sm:h-10 w-auto group-hover:scale-105 transition-transform" />
+            <span className="font-black text-base sm:text-xl tracking-wider text-white leading-none">
+              CLUBORA
+            </span>
           </Link>
 
           {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-zinc-300">
             <Link 
               to="/" 
-              className={`transition-colors py-1 ${location.pathname === '/' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-white'}`}
+              className={`transition-colors py-1 ${location.pathname === '/' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Home
             </Link>
 
-            <button onClick={() => scrollToSection('membership')} className="hover:text-white transition-colors py-1">
+            <button onClick={() => scrollToSection('membership')} className="hover:text-lime-700 dark:hover:text-lime-400 transition-colors py-1">
               Membership
             </button>
 
             <Link 
               to="/bookings" 
-              className={`transition-colors py-1 ${location.pathname === '/bookings' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-white'}`}
+              className={`transition-colors py-1 ${location.pathname === '/bookings' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Courts & Schedule
             </Link>
 
             <Link 
               to="/shop" 
-              className={`transition-colors py-1 ${location.pathname === '/shop' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-white'}`}
+              className={`transition-colors py-1 ${location.pathname === '/shop' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Shop
             </Link>
 
-            <button onClick={() => scrollToSection('about')} className="hover:text-white transition-colors py-1">
+            <Link 
+              to="/bar-cafe" 
+              className={`transition-colors py-1 ${location.pathname === '/bar-cafe' || location.pathname === '/member' ? 'text-lime-400 font-extrabold border-b-2 border-lime-400' : 'hover:text-lime-700 dark:hover:text-lime-400'}`}
+            >
+              Bar & Cafe
+            </Link>
+
+            <button onClick={() => scrollToSection('about')} className="hover:text-lime-700 dark:hover:text-lime-400 transition-colors py-1">
               About
             </button>
-
-            {user && (
-              <Link
-                to={getDashboardPath(user.role)}
-                className="hover:text-white transition flex items-center gap-1.5 text-lime-400 font-bold bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl shadow-inner hover:border-lime-500/40"
-              >
-                <LayoutDashboard className="w-3.5 h-3.5 text-lime-400" /> My Dashboard
-              </Link>
-            )}
           </nav>
 
           {/* Right Controls */}
@@ -155,17 +142,21 @@ export default function Navbar({ user, onLogout }) {
             {user ? (
               /* Logged In User Controls (Shown on Tablet & Desktop) */
               <div className="hidden sm:flex items-center gap-2 sm:gap-3">
-                <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-2.5 py-1.5 rounded-xl shadow-inner">
+                <Link
+                  to={user.role === 'MEMBER' ? '/bar-cafe' : getDashboardPath(user.role)}
+                  className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800/90 border border-zinc-800 px-2.5 py-1.5 rounded-xl shadow-inner transition group cursor-pointer"
+                  title={user.role === 'MEMBER' ? 'Member Portal' : 'Admin Portal'}
+                >
                   <div className="w-7 h-7 rounded-lg bg-lime-400 text-zinc-950 font-black flex items-center justify-center text-xs shadow-md">
                     {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <div className="text-left hidden lg:block">
-                    <div className="text-xs font-bold text-white leading-none">{user.name}</div>
+                    <div className="text-xs font-bold text-white leading-none group-hover:text-lime-300 transition-colors">{user.name}</div>
                     <div className="text-[9px] font-bold text-lime-400 uppercase tracking-wider mt-0.5">
                       {getRoleLabel(user.role)}
                     </div>
                   </div>
-                </div>
+                </Link>
 
                 <button
                   onClick={() => {
@@ -292,14 +283,14 @@ export default function Navbar({ user, onLogout }) {
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-white'}`}
+              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Home
             </Link>
 
             <button
               onClick={() => scrollToSection('membership')}
-              className="text-left px-3.5 py-2.5 rounded-xl hover:bg-zinc-900 hover:text-white transition"
+              className="text-left px-3.5 py-2.5 rounded-xl hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400 transition"
             >
               Membership
             </button>
@@ -307,7 +298,7 @@ export default function Navbar({ user, onLogout }) {
             <Link
               to="/bookings"
               onClick={() => setMobileMenuOpen(false)}
-              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/bookings' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-white'}`}
+              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/bookings' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Courts & Schedule
             </Link>
@@ -315,27 +306,37 @@ export default function Navbar({ user, onLogout }) {
             <Link
               to="/shop"
               onClick={() => setMobileMenuOpen(false)}
-              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/shop' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-white'}`}
+              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/shop' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400'}`}
             >
               Shop
             </Link>
 
+            <Link
+              to="/bar-cafe"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`px-3.5 py-2.5 rounded-xl transition ${location.pathname === '/bar-cafe' || location.pathname === '/member' ? 'bg-zinc-900 text-lime-400 font-black' : 'hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400'}`}
+            >
+              Bar & Cafe
+            </Link>
+
             <button
               onClick={() => scrollToSection('about')}
-              className="text-left px-3.5 py-2.5 rounded-xl hover:bg-zinc-900 hover:text-white transition"
+              className="text-left px-3.5 py-2.5 rounded-xl hover:bg-zinc-900 hover:text-lime-700 dark:hover:text-lime-400 transition"
             >
               About
             </button>
 
-            {user ? (
+            {user && user.role !== 'MEMBER' && (
               <Link
                 to={getDashboardPath(user.role)}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-lime-400/10 text-lime-400 font-bold border border-lime-400/30 mt-1"
               >
-                <LayoutDashboard className="w-4 h-4" /> My Dashboard ({getRoleLabel(user.role)})
+                <LayoutDashboard className="w-4 h-4" /> Staff Admin Portal ({getRoleLabel(user.role)})
               </Link>
-            ) : (
+            )}
+
+            {!user && (
               <div className="pt-2 space-y-2 border-t border-zinc-800/80">
                 <div className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-3">
                   Access Portals

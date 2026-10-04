@@ -1,10 +1,37 @@
 import { query } from '../config/db.js';
 
+async function ensureInvoicesTable() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS invoices (
+      id VARCHAR(36) PRIMARY KEY,
+      invoice_number VARCHAR(50) UNIQUE NOT NULL,
+      client_name VARCHAR(255) NOT NULL,
+      client_email VARCHAR(255) NOT NULL,
+      type VARCHAR(50) NOT NULL,
+      amount NUMERIC(10,2) NOT NULL,
+      due_date VARCHAR(20) NOT NULL,
+      status VARCHAR(50) DEFAULT 'PENDING',
+      paid_at TIMESTAMP WITH TIME ZONE,
+      notes TEXT,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  const cols = [
+    "ALTER TABLE invoices ADD COLUMN IF NOT EXISTS notes TEXT",
+    "ALTER TABLE invoices ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP WITH TIME ZONE"
+  ];
+  for (const sql of cols) {
+    try { await query(sql); } catch (e) {}
+  }
+}
+
 /**
  * GET /api/invoices - List all invoices with optional status filter
  */
 export async function getInvoices(req, res) {
   try {
+    await ensureInvoicesTable();
     const { status, type } = req.query;
     let sql = `
       SELECT id, invoice_number AS "invoiceNumber", client_name AS "clientName",
@@ -35,7 +62,7 @@ export async function getInvoices(req, res) {
     return res.json(invoices);
   } catch (error) {
     console.error('getInvoices Error:', error);
-    return res.status(500).json({ error: 'Failed to fetch invoices.' });
+    return res.status(500).json({ error: error.message || 'Failed to fetch invoices.' });
   }
 }
 
@@ -44,6 +71,7 @@ export async function getInvoices(req, res) {
  */
 export async function getInvoiceSummary(req, res) {
   try {
+    await ensureInvoicesTable();
     const totalRes = await query(`SELECT COUNT(*) AS count, COALESCE(SUM(amount), 0) AS total FROM invoices`);
     const pendingRes = await query(`SELECT COUNT(*) AS count, COALESCE(SUM(amount), 0) AS total FROM invoices WHERE status = 'PENDING'`);
     const paidRes = await query(`SELECT COUNT(*) AS count, COALESCE(SUM(amount), 0) AS total FROM invoices WHERE status = 'PAID'`);
@@ -57,7 +85,7 @@ export async function getInvoiceSummary(req, res) {
     });
   } catch (error) {
     console.error('getInvoiceSummary Error:', error);
-    return res.status(500).json({ error: 'Failed to fetch invoice summary.' });
+    return res.status(500).json({ error: error.message || 'Failed to fetch invoice summary.' });
   }
 }
 
@@ -66,6 +94,7 @@ export async function getInvoiceSummary(req, res) {
  */
 export async function createInvoice(req, res) {
   try {
+    await ensureInvoicesTable();
     const { clientName, clientEmail, type, amount, dueDate, notes = '' } = req.body;
 
     if (!clientName || !clientEmail || !type || !amount || !dueDate) {
@@ -86,7 +115,7 @@ export async function createInvoice(req, res) {
     });
   } catch (error) {
     console.error('createInvoice Error:', error);
-    return res.status(500).json({ error: 'Failed to create invoice.' });
+    return res.status(500).json({ error: error.message || 'Failed to create invoice.' });
   }
 }
 

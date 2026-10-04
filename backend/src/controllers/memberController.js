@@ -203,12 +203,20 @@ export async function createMember(req, res) {
 export async function updateMemberPlan(req, res) {
   try {
     const { id } = req.params;
-    const { tierId, extendMonths = 12 } = req.body;
+    const { tierId, tierName, extendMonths, durationMonths } = req.body;
+    const months = parseInt(durationMonths || extendMonths || 12, 10);
 
-    const tierRows = await query('SELECT * FROM membership_tiers WHERE id = $1', [tierId]);
+    let tierRows = [];
+    if (tierId) {
+      tierRows = await query('SELECT * FROM membership_tiers WHERE id = $1', [tierId]);
+    } else if (tierName) {
+      tierRows = await query('SELECT * FROM membership_tiers WHERE LOWER(name) = LOWER($1)', [tierName]);
+    }
+
     if (tierRows.length === 0) {
       return res.status(404).json({ error: 'Membership tier not found.' });
     }
+    const tier = tierRows[0];
 
     const memberRows = await query('SELECT * FROM members WHERE id = $1', [id]);
     if (memberRows.length === 0) {
@@ -217,13 +225,13 @@ export async function updateMemberPlan(req, res) {
 
     const currentExpiry = new Date(memberRows[0].expires_at);
     const baseDate = currentExpiry > new Date() ? currentExpiry : new Date();
-    baseDate.setMonth(baseDate.getMonth() + parseInt(extendMonths, 10));
+    baseDate.setMonth(baseDate.getMonth() + months);
 
     await query(`
       UPDATE members
       SET tier_id = $1, expires_at = $2, status = 'ACTIVE', updated_at = CURRENT_TIMESTAMP
       WHERE id = $3
-    `, [tierId, baseDate.toISOString(), id]);
+    `, [tier.id, baseDate.toISOString(), id]);
 
     const updatedRows = await query(`
       SELECT 

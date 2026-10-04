@@ -5,7 +5,7 @@ import {
   CheckCircle2, X, Users, Shield, Coffee, Briefcase
 } from 'lucide-react';
 
-export default function StaffShiftsPage() {
+export default function StaffShiftsPage({ isEmbedded = false }) {
   const [activeTab, setActiveTab] = useState('shifts');
   const [shifts, setShifts] = useState([]);
   const [leaves, setLeaves] = useState([]);
@@ -99,18 +99,18 @@ export default function StaffShiftsPage() {
   const pendingLeaves = leaves.filter(l => l.status === 'PENDING');
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 text-white">
+    <div className={isEmbedded ? 'w-full min-w-0 text-white' : 'max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-white'}>
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-black text-white flex items-center gap-3 tracking-tight">
-            <Clock className="w-8 h-8 text-lime-400" /> Staff Shifts & Leave Management
+      <div className={isEmbedded ? 'owner-tab-actions flex justify-end' : 'flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6'}>
+        {!isEmbedded && <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
+            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-lime-400" /> Staff Shifts & Leave Management
           </h1>
           <p className="text-zinc-400 text-sm mt-1 font-medium">
             Schedule employee shifts, manage work rosters, and approve leave requests.
           </p>
-        </div>
+        </div>}
         <div className="flex gap-2">
           <button onClick={() => setShowShiftModal(true)}
             className="flex items-center gap-2 px-5 py-2.5 bg-lime-400 hover:bg-lime-300 text-zinc-950 rounded-2xl text-xs font-black shadow-lg shadow-lime-400/20 transition-all cursor-pointer">
@@ -124,7 +124,7 @@ export default function StaffShiftsPage() {
       </div>
 
       {/* Summary Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 ${isEmbedded ? 'mb-4' : 'mb-8'}`}>
         <div className="bg-zinc-900 text-white p-5 rounded-3xl border border-zinc-800 shadow-2xl">
           <div className="text-[10px] font-bold text-lime-400 uppercase tracking-wider">Total Shifts</div>
           <div className="text-2xl font-black mt-1">{shifts.length}</div>
@@ -144,7 +144,7 @@ export default function StaffShiftsPage() {
       </div>
 
       {/* Tab Switch */}
-      <div className="bg-zinc-900 p-1.5 rounded-2xl flex gap-1 mb-6 w-fit border border-zinc-800">
+      <div className={`bg-zinc-900 p-1.5 rounded-2xl flex gap-1 ${isEmbedded ? 'mb-4' : 'mb-6'} w-fit border border-zinc-800`}>
         <button onClick={() => setActiveTab('shifts')}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition ${
             activeTab === 'shifts' ? 'bg-lime-400 text-zinc-950 shadow-md shadow-lime-400/20' : 'text-zinc-400 hover:text-white'
@@ -272,7 +272,7 @@ export default function StaffShiftsPage() {
       {/* Create Shift Modal */}
       {showShiftModal && (
         <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-zinc-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-zinc-800 text-white">
+          <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 w-[calc(100%-32px)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-800 text-white">
             <h3 className="text-2xl font-black text-white mb-6">Schedule New Shift</h3>
             <form onSubmit={handleCreateShift} className="space-y-4">
               <div>
@@ -333,7 +333,7 @@ export default function StaffShiftsPage() {
       {/* Create Leave Request Modal */}
       {showLeaveModal && (
         <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-zinc-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-zinc-800 text-white">
+          <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 w-[calc(100%-32px)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-800 text-white">
             <h3 className="text-2xl font-black text-white mb-6">Submit Leave Request</h3>
             <form onSubmit={handleCreateLeave} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

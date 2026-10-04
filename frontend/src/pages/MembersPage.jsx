@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api';
 import { Users, UserPlus, Search, Shield, Clock, AlertTriangle, CheckCircle, ChevronRight, RefreshCw, Star, Crown, Trophy } from 'lucide-react';
 
-export default function MembersPage() {
+export default function MembersPage({ isEmbedded = false }) {
   const [members, setMembers] = useState([]);
   const [tiers, setTiers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -80,18 +80,18 @@ export default function MembersPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 bg-zinc-950 min-h-screen text-zinc-100">
+    <div className={isEmbedded ? 'w-full min-w-0 space-y-6' : 'max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-zinc-950 min-h-screen text-zinc-100'}>
       
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl font-black text-white flex items-center gap-2">
-            <Users className="w-7 h-7 text-lime-400" /> Member Directory & Front Desk
+      <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 ${isEmbedded ? 'mb-4' : 'mb-6'}`}>
+        {!isEmbedded && <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
+            <Users className="w-7 h-7 sm:w-8 sm:h-8 text-lime-400" /> Member Directory & Front Desk
           </h1>
           <p className="text-zinc-400 text-xs mt-1 font-medium">
             Manage membership plans (Gold, Silver, Junior), check expiration dates, and view activity history.
           </p>
-        </div>
+        </div>}
         <button
           onClick={() => setShowAddModal(true)}
           className="inline-flex items-center justify-center gap-2 bg-lime-400 hover:bg-lime-300 text-zinc-950 px-5 py-2.5 rounded-xl font-black text-xs shadow-lg shadow-lime-400/20 transition"
@@ -101,7 +101,7 @@ export default function MembersPage() {
       </div>
 
       {/* Tier Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {tiers.filter(t => t.name !== 'Walk-in').map(tier => {
           if (tier.name === 'Gold') {
             return (
@@ -114,7 +114,7 @@ export default function MembersPage() {
                     </div>
                     <h3 className="text-xl font-black text-white mt-1">{tier.name}</h3>
                   </div>
-                  <span className="text-xl font-black text-amber-400">${tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
+                  <span className="text-xl font-black text-amber-400">₹{tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
                 </div>
                 <div className="mt-4 space-y-1.5 text-xs text-zinc-200 border-t border-amber-500/20 pt-3">
                   <div className="flex items-center gap-1.5 font-medium">
@@ -139,7 +139,7 @@ export default function MembersPage() {
                     </div>
                     <h3 className="text-xl font-black text-white mt-1">{tier.name}</h3>
                   </div>
-                  <span className="text-xl font-black text-zinc-200">${tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
+                  <span className="text-xl font-black text-zinc-200">₹{tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
                 </div>
                 <div className="mt-4 space-y-1.5 text-xs text-zinc-300 border-t border-zinc-800 pt-3">
                   <div className="flex items-center gap-1.5 font-medium">
@@ -164,7 +164,7 @@ export default function MembersPage() {
                   </div>
                   <h3 className="text-xl font-black text-white mt-1">{tier.name}</h3>
                 </div>
-                <span className="text-xl font-black text-sky-400">${tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
+                <span className="text-xl font-black text-sky-400">₹{tier.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></span>
               </div>
               <div className="mt-4 space-y-1.5 text-xs text-zinc-300 border-t border-sky-500/20 pt-3">
                 <div className="flex items-center gap-1.5 font-medium">
@@ -324,7 +324,7 @@ export default function MembersPage() {
                           <div className="font-bold text-white">{b.court?.name}</div>
                           <div className="text-zinc-500 text-[10px]">{b.bookingDate} | {b.startTime} - {b.endTime}</div>
                         </div>
-                        <span className="font-black text-lime-400">${b.finalFee.toFixed(2)}</span>
+                        <span className="font-black text-lime-400">₹{b.finalFee.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -343,7 +343,7 @@ export default function MembersPage() {
       {/* Add Member Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-zinc-900 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-zinc-800 text-zinc-100">
+          <div className="bg-zinc-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 w-[calc(100%-32px)] sm:w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl border border-zinc-800 text-zinc-100">
             <h3 className="text-xl font-black text-white mb-1">Register New Member</h3>
             <p className="text-xs text-zinc-400 mb-6 font-medium">Select a plan tier (Gold, Silver, Junior) and enter member details.</p>
 
@@ -383,7 +383,7 @@ export default function MembersPage() {
                 <label className="block text-xs font-bold text-zinc-300 mb-1">Phone Number</label>
                 <input
                   type="text"
-                  placeholder="+1 555-0100"
+                  placeholder="+91 98765 43210"
                   value={newMember.phone}
                   onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white focus:ring-2 focus:ring-lime-400 focus:outline-none"
@@ -399,7 +399,7 @@ export default function MembersPage() {
                 >
                   {tiers.filter(t => t.name !== 'Walk-in').map(t => (
                     <option key={t.id} value={t.id}>
-                      {t.name} Tier (${t.monthlyFee}/mo - {t.courtDiscountPercent}% off courts)
+                      {t.name} Tier (₹{t.monthlyFee}/mo - {t.courtDiscountPercent}% off courts)
                     </option>
                   ))}
                 </select>
