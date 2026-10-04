@@ -1,6 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Universal crisp font rendering */
+*, *::before, *::after {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 /* CSS Custom Variables for Theme Tokenization */
 :root,
@@ -39,6 +46,12 @@ body,
   padding: 0;
   min-height: 100%;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
@@ -58,7 +71,7 @@ html.light #root {
 
 body {
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 #root {
@@ -73,10 +86,35 @@ body {
    Ensures ZERO black cards, dark gradients, or unreadable dark elements remain
    ========================================================================== */
 
+/* Hero Section Background Image & Overlay Preservation (Guarantees image shows up in both Light & Dark modes) */
+html.light section.hero-section-bg,
+html.light section.hero-section-bg > div,
+html.light .hero-section-bg {
+  background-color: transparent;
+}
+
+html.light img.hero-bg-img,
+html.dark img.hero-bg-img {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: transparent !important;
+}
+
+html.light div.hero-overlay-bg {
+  background-image: linear-gradient(to bottom, rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.65)) !important;
+  background-color: transparent !important;
+}
+
+html.dark div.hero-overlay-bg {
+  background-image: linear-gradient(to bottom, rgba(9, 9, 11, 0.42), rgba(9, 9, 11, 0.26), rgba(9, 9, 11, 0.58)) !important;
+  background-color: transparent !important;
+}
+
 /* Page & Section Layouts */
 html.light main,
-html.light section,
-html.light div.bg-zinc-950,
+html.light section:not(.hero-section-bg),
+html.light div.bg-zinc-950:not(.hero-section-bg),
 html.light div.bg-zinc-950\/95,
 html.light div.bg-zinc-950\/90,
 html.light div.bg-zinc-950\/80,
@@ -115,8 +153,13 @@ html.light span.bg-zinc-950,
 html.light span.bg-black,
 html.light p.bg-zinc-950,
 html.light p.bg-black,
-html.light div.bg-zinc-950,
-html.light div.bg-black,
+html.light div.bg-zinc-950:not(.hero-section-bg),
+html.light div.bg-black:not(.hero-overlay-bg),
+html.light button.bg-zinc-950,
+html.light button.bg-zinc-900,
+html.light button.bg-zinc-800,
+html.light button.bg-zinc-800\/80,
+html.light a.bg-zinc-950,
 html.light td.bg-zinc-950,
 html.light th.bg-zinc-950,
 html.light tr.bg-zinc-950,
@@ -129,7 +172,7 @@ html.light tfoot.bg-black {
 }
 
 /* Cards, Modals, Dropdowns & Elevated Containers */
-html.light .bg-zinc-900,
+html.light .bg-zinc-900:not(.hero-section-bg),
 html.light .bg-zinc-900\/95,
 html.light .bg-zinc-900\/90,
 html.light .bg-zinc-900\/80,
@@ -139,7 +182,7 @@ html.light .bg-zinc-900\/40,
 html.light .bg-zinc-900\/30,
 html.light .bg-zinc-900\/20,
 html.light .bg-zinc-950\/60,
-html.light .bg-black,
+html.light .bg-black:not(.hero-overlay-bg),
 html.light .bg-black\/95,
 html.light .bg-black\/90,
 html.light .bg-black\/80,
@@ -152,7 +195,7 @@ html.light .bg-black\/40 {
 }
 
 /* Gradient Background Overrides for Light Mode (Fixes Membership Cards & Tier Overview) */
-html.light .bg-gradient-to-b,
+html.light .bg-gradient-to-b:not(.hero-overlay-bg),
 html.light .bg-gradient-to-tr,
 html.light .bg-gradient-to-r,
 html.light .bg-gradient-to-tl,
@@ -197,10 +240,23 @@ html.light .border-zinc-900 {
 }
 
 /* Text Colors in Light Mode */
-html.light .text-white,
-html.light .text-zinc-100,
-html.light .text-zinc-200 {
+html.light .text-white:not(.hero-text-white):not(.hero-title-white),
+html.light .text-zinc-100:not(.hero-text-white),
+html.light .text-zinc-200:not(.hero-text-white) {
   color: #0f172a !important;
+}
+
+/* Explicit Hero Text Preservation (Guarantees White & Green fonts on top of hero background image in both themes) */
+html.light .hero-text-white,
+html.dark .hero-text-white,
+html.light .hero-title-white,
+html.dark .hero-title-white {
+  color: #ffffff !important;
+}
+
+html.light .hero-text-lime,
+html.dark .hero-text-lime {
+  color: #a3e635 !important;
 }
 
 html.light .text-zinc-300,
@@ -333,4 +389,64 @@ html.light button.bg-zinc-800:hover {
   max-width: 100%;
   max-height: 90vh;
   overflow-y: auto;
+}
+
+.owner-tab-content > * {
+  min-width: 0;
+}
+
+.owner-tab-content {
+  position: relative;
+}
+
+.owner-tab-actions {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  z-index: 2;
+  margin: 0 !important;
+}
+
+.owner-tab-content .owner-tab-actions + * {
+  margin-top: 0.75rem !important;
+}
+
+@media (max-width: 1023px) {
+  .owner-tab-actions {
+    position: static;
+    justify-content: flex-end;
+    margin: 0 0 0.75rem !important;
+  }
+}
+
+html.light .owner-tab-content div:not(.fixed)[class*="bg-zinc-900"],
+html.light .owner-tab-content div:not(.fixed)[class*="bg-zinc-950"],
+html.light .owner-tab-content div:not(.fixed)[class*="bg-gradient"] {
+  border-radius: 16px;
+  border-color: #e2e8f0;
+}
+
+html.light .owner-tab-content div:not(.fixed)[class*="bg-zinc-900"] {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Shared Front Desk surfaces keep embedded tabs visually consistent. */
+.front-desk-ui div:not(.fixed)[class*="bg-zinc-900"],
+.front-desk-ui div:not(.fixed)[class*="bg-zinc-950"],
+.front-desk-ui div:not(.fixed)[class*="bg-gradient"],
+.front-desk-ui div:not(.fixed).bg-white {
+  border-radius: 16px;
+}
+
+html.light .front-desk-ui div:not(.fixed)[class*="bg-zinc-900"],
+html.light .front-desk-ui div:not(.fixed)[class*="bg-gradient"],
+html.light .front-desk-ui div:not(.fixed).bg-white {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light .front-desk-ui div:not(.fixed)[class*="bg-zinc-950"] {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
 }

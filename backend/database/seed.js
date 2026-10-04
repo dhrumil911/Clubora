@@ -61,9 +61,9 @@ export async function runMigrationsAndSeed() {
     if (parseInt(tiersCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO membership_tiers (id, name, monthly_fee, court_discount_percent, shop_discount_percent, bar_discount_percent, description) VALUES
-        ('tier-gold', 'Gold', 150.00, 100.00, 20.00, 20.00, 'Premium full access tier with free courts and 20% discount on shop & bar.'),
-        ('tier-silver', 'Silver', 80.00, 50.00, 10.00, 10.00, 'Standard tier with 50% off courts and 10% discount on shop & bar.'),
-        ('tier-junior', 'Junior', 45.00, 50.00, 15.00, 15.00, 'Under 18 tier with special court rates and equipment discounts.'),
+        ('tier-gold', 'Gold', 2499.00, 100.00, 20.00, 20.00, 'Premium full access tier with free courts and 20% discount on shop & bar.'),
+        ('tier-silver', 'Silver', 1299.00, 50.00, 10.00, 10.00, 'Standard tier with 50% off courts and 10% discount on shop & bar.'),
+        ('tier-junior', 'Junior', 699.00, 50.00, 15.00, 15.00, 'Under 18 tier with special court rates and equipment discounts.'),
         ('tier-walkin', 'Walk-in', 0.00, 0.00, 0.00, 0.00, 'Non-member standard pricing.')`
       );
       console.log('✅ Seeded membership tiers.');
@@ -91,12 +91,12 @@ export async function runMigrationsAndSeed() {
     if (parseInt(courtsCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO courts (id, name, sport, hourly_rate, is_available) VALUES
-        ('crt-1', 'Tennis Court 1 (Center)', 'TENNIS', 40.00, true),
-        ('crt-2', 'Tennis Court 2 (Outer)', 'TENNIS', 35.00, true),
-        ('crt-3', 'Cricket Nets 1', 'CRICKET', 50.00, true),
-        ('crt-4', 'Cricket Nets 2', 'CRICKET', 50.00, true),
-        ('crt-5', 'Padel Court 1', 'PADEL', 45.00, true),
-        ('crt-6', 'Badminton Court 1', 'BADMINTON', 30.00, true)`
+        ('crt-1', 'Tennis Court 1 (Center)', 'TENNIS', 800.00, true),
+        ('crt-2', 'Tennis Court 2 (Outer)', 'TENNIS', 700.00, true),
+        ('crt-3', 'Cricket Nets 1', 'CRICKET', 600.00, true),
+        ('crt-4', 'Cricket Nets 2', 'CRICKET', 600.00, true),
+        ('crt-5', 'Padel Court 1', 'PADEL', 900.00, true),
+        ('crt-6', 'Badminton Court 1', 'BADMINTON', 450.00, true)`
       );
       console.log('✅ Seeded courts.');
     }
@@ -106,13 +106,13 @@ export async function runMigrationsAndSeed() {
     if (parseInt(productsCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO products (id, name, category, price, stock_quantity, low_stock_threshold) VALUES
-        ('prd-1', 'Pro Tennis Racket (Wilson Pro Staff)', 'RACKET', 220.00, 8, 3),
-        ('prd-2', 'Junior Tennis Racket', 'RACKET', 65.00, 3, 4),
-        ('prd-3', 'Tennis Balls Can (3-pack)', 'BALLS', 12.00, 45, 10),
-        ('prd-4', 'Padel Balls Can (3-pack)', 'BALLS', 14.00, 30, 8),
-        ('prd-5', 'Court Tennis Shoes (White)', 'SHOES', 110.00, 12, 5),
-        ('prd-6', 'Absorbent Sweatband Set', 'ACCESSORIES', 15.00, 25, 5),
-        ('prd-7', 'Club Premium Polo Shirt', 'APPAREL', 45.00, 2, 5)`
+        ('prd-1', 'Pro Tennis Racket (Wilson Pro Staff)', 'RACKET', 8999.00, 8, 3),
+        ('prd-2', 'Junior Tennis Racket', 'RACKET', 2499.00, 3, 4),
+        ('prd-3', 'Tennis Balls Can (3-pack)', 'BALLS', 499.00, 45, 10),
+        ('prd-4', 'Padel Balls Can (3-pack)', 'BALLS', 599.00, 30, 8),
+        ('prd-5', 'Court Tennis Shoes (White)', 'SHOES', 4499.00, 12, 5),
+        ('prd-6', 'Absorbent Sweatband Set', 'ACCESSORIES', 299.00, 25, 5),
+        ('prd-7', 'Club Premium Polo Shirt', 'APPAREL', 1299.00, 2, 5)`
       );
       console.log('✅ Seeded gear shop products.');
     }
@@ -122,13 +122,13 @@ export async function runMigrationsAndSeed() {
     if (parseInt(barItemsCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO bar_items (id, name, category, price, is_available) VALUES
-        ('bar-1', 'Fresh Protein Shake (Berry/Vanilla)', 'BEVERAGE', 8.50, true),
-        ('bar-2', 'Iced Electrolyte Energy Drink', 'BEVERAGE', 4.50, true),
-        ('bar-3', 'Espresso / Cappuccino', 'BEVERAGE', 4.00, true),
-        ('bar-4', 'Craft Draft Beer (Pint)', 'BEVERAGE', 7.50, true),
-        ('bar-5', 'Avocado Toast & Poached Egg', 'SNACK', 11.00, true),
-        ('bar-6', 'Grilled Chicken & Quinoa Bowl', 'MEAL', 14.50, true),
-        ('bar-7', 'Post-Match Burger & Fries', 'MEAL', 16.00, true)`
+        ('bar-1', 'Fresh Protein Shake (Berry/Vanilla)', 'BEVERAGE', 180.00, true),
+        ('bar-2', 'Iced Electrolyte Energy Drink', 'BEVERAGE', 90.00, true),
+        ('bar-3', 'Espresso / Cappuccino', 'BEVERAGE', 120.00, true),
+        ('bar-4', 'Craft Draft Beer (Pint)', 'BEVERAGE', 280.00, true),
+        ('bar-5', 'Avocado Toast & Poached Egg', 'SNACK', 220.00, true),
+        ('bar-6', 'Grilled Chicken & Quinoa Bowl', 'MEAL', 280.00, true),
+        ('bar-7', 'Post-Match Burger & Fries', 'MEAL', 260.00, true)`
       );
       console.log('✅ Seeded bar items.');
     }
@@ -172,7 +172,7 @@ export async function runMigrationsAndSeed() {
       );
       await query(
         `INSERT INTO quotes (id, lead_id, tier_name, court_hours, total_price, valid_until, status) VALUES
-        ('q-1', 'lead-1', 'Gold Corporate', 8, 480.00, '2026-10-31', 'SENT')`
+        ('q-1', 'lead-1', 'Gold Corporate', 8, 32000.00, '2026-10-31', 'SENT')`
       );
       console.log('✅ Seeded leads & quotes.');
     }
@@ -203,10 +203,10 @@ export async function runMigrationsAndSeed() {
     if (parseInt(invoicesCount[0].count, 10) === 0) {
       await query(
         `INSERT INTO invoices (id, invoice_number, client_name, client_email, type, amount, due_date, status, notes) VALUES
-        ('inv-1', 'INV-2026-001', 'TechCorp Solutions', 'billing@techcorp.com', 'CORPORATE', 1200.00, '2026-10-25', 'PENDING', 'Quarterly corporate membership & court reservation package.'),
-        ('inv-2', 'INV-2026-002', 'StartupCo Ltd', 'accounts@startupco.com', 'CORPORATE', 800.00, '2026-10-15', 'PENDING', 'Monthly team-building court rental.'),
-        ('inv-3', 'INV-2026-003', 'City Sports Academy', 'finance@citysports.org', 'MEMBERSHIP', 2400.00, '2026-09-30', 'OVERDUE', 'Annual junior coaching program fees.'),
-        ('inv-4', 'INV-2026-004', 'Wellness Works Inc', 'pay@wellnessworks.com', 'CORPORATE', 650.00, '2026-09-20', 'PAID', 'Employee wellness program - September.')`
+        ('inv-1', 'INV-2026-001', 'TechCorp Solutions', 'billing@techcorp.com', 'CORPORATE', 45000.00, '2026-10-25', 'PENDING', 'Quarterly corporate membership & court reservation package.'),
+        ('inv-2', 'INV-2026-002', 'StartupCo Ltd', 'accounts@startupco.com', 'CORPORATE', 28000.00, '2026-10-15', 'PENDING', 'Monthly team-building court rental.'),
+        ('inv-3', 'INV-2026-003', 'City Sports Academy', 'finance@citysports.org', 'MEMBERSHIP', 65000.00, '2026-09-30', 'OVERDUE', 'Annual junior coaching program fees.'),
+        ('inv-4', 'INV-2026-004', 'Wellness Works Inc', 'pay@wellnessworks.com', 'CORPORATE', 22000.00, '2026-09-20', 'PAID', 'Employee wellness program - September.')`
       );
       console.log('✅ Seeded invoices.');
     }

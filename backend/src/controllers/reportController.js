@@ -200,7 +200,7 @@ export async function getExportData(req, res) {
 
     // Get all invoices
     const invoices = await query(`
-      SELECT id, invoice_number, client_name, type, amount, due_date, status, paid_at
+      SELECT id, invoice_number, client_name, type, amount, due_date, status
       FROM invoices ${dateFilter || ''} ORDER BY created_at DESC
     `);
 

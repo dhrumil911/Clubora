@@ -7,7 +7,7 @@ export default function BarShopDashboardPage({ user }) {
   const [activeTab, setActiveTab] = useState('bar');
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 bg-zinc-950 min-h-screen">
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-zinc-950 min-h-screen">
       
       {/* Bar/Shop Staff Header */}
       <div className="bg-zinc-900 text-zinc-100 p-4 sm:p-6 rounded-3xl border border-zinc-800 shadow-2xl mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -44,7 +44,7 @@ export default function BarShopDashboardPage({ user }) {
       {/* Active Tab View */}
       <div>
         {activeTab === 'bar' && <BarPOSPage user={user} />}
-        {activeTab === 'shop' && <ShopPage />}
+        {activeTab === 'shop' && <ShopPage user={user} />}
       </div>
 
     </div>

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api';
-import { Globe, Trophy, ShieldCheck, Calendar, ShoppingBag, Send, CheckCircle2, Star, Zap, Crown, Shield } from 'lucide-react';
+import { Globe, Trophy, ShieldCheck, Calendar, ShoppingBag, Send, CheckCircle2, Star, Zap, Crown, Shield, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 export default function PublicWebsitePage() {
+  const { theme } = useTheme();
   const [tiers, setTiers] = useState([]);
   const [selectedPlanName, setSelectedPlanName] = useState('Gold');
   const [courts, setCourts] = useState([]);
   const [products, setProducts] = useState([]);
   const [form, setForm] = useState({ name: '', phone: '', email: '', interest: 'Membership Enquiry', notes: '' });
   const [submitted, setSubmitted] = useState(false);
+
+  const isLight = theme === 'light';
 
   useEffect(() => {
     fetchPublicData();
@@ -41,17 +45,17 @@ export default function PublicWebsitePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className={isLight ? "min-h-screen bg-slate-100 text-slate-900 transition-colors duration-300" : "min-h-screen bg-slate-900 text-white transition-colors duration-300"}>
       
       {/* Hero Banner */}
-      <div className="relative py-20 px-4 text-center max-w-5xl mx-auto overflow-hidden">
-        <div className="inline-flex items-center gap-2 bg-sky-950 text-sky-400 border border-sky-800 px-4 py-1.5 rounded-full text-xs font-bold mb-6">
+      <div className="relative py-12 sm:py-20 px-4 text-center max-w-5xl mx-auto overflow-hidden">
+        <div className={isLight ? "inline-flex items-center gap-2 bg-slate-200 text-sky-700 border border-sky-400/30 px-4 py-1.5 rounded-full text-xs font-bold mb-6" : "inline-flex items-center gap-2 bg-sky-950 text-sky-400 border border-sky-800 px-4 py-1.5 rounded-full text-xs font-bold mb-6"}>
           <Trophy className="w-4 h-4" /> Welcome to The Champions Club
         </div>
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-sky-300 bg-clip-text text-transparent">
+        <h1 className={isLight ? "text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900" : "text-4xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-sky-300 bg-clip-text text-transparent"}>
           The Digital Backbone of Modern Sports Management
         </h1>
-        <p className="mt-6 text-slate-400 text-base sm:text-lg max-w-2xl mx-auto">
+        <p className={isLight ? "mt-6 text-slate-600 text-base sm:text-lg max-w-2xl mx-auto" : "mt-6 text-slate-400 text-base sm:text-lg max-w-2xl mx-auto"}>
           Tennis, padel, cricket nets, gear shop, post-match cafeteria, and seamless online booking — all under one unified platform.
         </p>
 
@@ -59,7 +63,7 @@ export default function PublicWebsitePage() {
           <a href="#trial" className="bg-sky-600 hover:bg-sky-500 text-white font-bold px-6 py-3 rounded-2xl text-sm shadow-lg shadow-sky-600/30 transition">
             Book a Trial Session
           </a>
-          <a href="#plans" className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-6 py-3 rounded-2xl text-sm border border-slate-700 transition">
+          <a href="#plans" className={isLight ? "bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3 rounded-2xl text-sm border border-slate-300 transition shadow-sm" : "bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-6 py-3 rounded-2xl text-sm border border-slate-700 transition"}>
             View Membership Plans
           </a>
         </div>
@@ -105,7 +109,7 @@ export default function PublicWebsitePage() {
                         </span>
                       </div>
 
-                      <div className="text-4xl font-black text-amber-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <div className="text-4xl font-black text-amber-400 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                       <p className="text-xs text-zinc-300 mt-2 font-medium">{t.description || 'All-access flagship membership with free court sessions and top discounts.'}</p>
 
                       <div className="mt-6 space-y-3 text-xs text-zinc-200 border-t border-amber-500/20 pt-4">
@@ -163,7 +167,7 @@ export default function PublicWebsitePage() {
                         </span>
                       </div>
 
-                      <div className="text-4xl font-black text-zinc-200 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                      <div className="text-4xl font-black text-zinc-200 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                       <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Standard membership with 50% court discount and gear perks.'}</p>
 
                       <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-zinc-800 pt-4">
@@ -221,7 +225,7 @@ export default function PublicWebsitePage() {
                       </span>
                     </div>
 
-                    <div className="text-4xl font-black text-sky-400 mt-4">${t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
+                    <div className="text-4xl font-black text-sky-400 mt-4">₹{t.monthlyFee}<span className="text-xs font-normal text-zinc-400">/mo</span></div>
                     <p className="text-xs text-zinc-400 mt-2 font-medium">{t.description || 'Youth & junior membership (under-18) for developing young athletes.'}</p>
 
                     <div className="mt-6 space-y-3 text-xs text-zinc-300 border-t border-sky-500/20 pt-4">
@@ -269,7 +273,7 @@ export default function PublicWebsitePage() {
                 <div className="text-xs text-sky-400 font-semibold">{c.sport}</div>
               </div>
               <div className="text-right">
-                <div className="font-extrabold text-white text-lg">${c.hourlyRate}/hr</div>
+                <div className="font-extrabold text-white text-lg">₹{c.hourlyRate}/hr</div>
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">Available</span>
               </div>
             </div>

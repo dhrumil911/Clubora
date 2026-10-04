@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { authenticateToken, authorizeRoles } from './middleware/auth.js';
+import { authenticateToken, authorizeRoles, optionalAuthenticateToken } from './middleware/auth.js';
 import * as authController from './controllers/authController.js';
 import * as memberController from './controllers/memberController.js';
 import * as bookingController from './controllers/bookingController.js';
@@ -12,6 +12,7 @@ import * as dashboardController from './controllers/dashboardController.js';
 import * as invoiceController from './controllers/invoiceController.js';
 import * as shiftController from './controllers/shiftController.js';
 import * as reportController from './controllers/reportController.js';
+import * as paymentController from './controllers/paymentController.js';
 
 import { query } from './config/db.js';
 
@@ -73,21 +74,54 @@ app.get('/api/members/tiers', authenticateToken, memberController.getTiers);
 app.get('/api/members', authenticateToken, memberController.getMembers);
 app.get('/api/members/:id', authenticateToken, memberController.getMemberById);
 app.post('/api/members', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), memberController.createMember);
-app.put('/api/members/:id/plan', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), memberController.updateMemberPlan);
+app.put('/api/members/:id/plan', authenticateToken, authorizeRoles('MEMBER', 'FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), memberController.updateMemberPlan);
 
 // 2. Court Booking Engine Routes (Members, Front Desk & Owner)
 app.get('/api/courts', authenticateToken, bookingController.getCourts);
 app.get('/api/bookings', authenticateToken, bookingController.getBookings);
 app.post('/api/bookings', authenticateToken, bookingController.createBooking);
 app.delete('/api/bookings/:id', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), bookingController.cancelBooking);
+app.post('/api/bookings/:id/check-in', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), bookingController.checkInBooking);
+app.get('/api/front-desk/stats', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), bookingController.getFrontDeskStats);
+
+// 2b. Razorpay Online & Offline Payment Routes
+app.post('/api/payments/razorpay/create-order', authenticateToken, paymentController.createRazorpayOrder);
+app.post('/api/payments/razorpay/verify', authenticateToken, paymentController.verifyRazorpayPayment);
+app.post('/api/payments/razorpay/cancel', authenticateToken, paymentController.cancelPendingBooking);
+app.post('/api/payments/cash', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), paymentController.recordCashPayment);
+
+// Membership Plan Razorpay Routes (New Registration & Renewal/Upgrade)
+app.post('/api/payments/razorpay/plan-order', optionalAuthenticateToken, paymentController.createRazorpayPlanOrder);
+app.post('/api/payments/razorpay/verify-plan', optionalAuthenticateToken, paymentController.verifyRazorpayPlanPayment);
+
+// Shop Razorpay Online Payment Routes
+app.post('/api/payments/razorpay/shop-order', authenticateToken, paymentController.createRazorpayShopOrder);
+app.post('/api/payments/razorpay/verify-shop', authenticateToken, paymentController.verifyRazorpayShopPayment);
+
+// Bar & Cafeteria Razorpay Online Payment Routes
+app.post('/api/payments/razorpay/bar-order', authenticateToken, paymentController.createRazorpayBarOrder);
+app.post('/api/payments/razorpay/verify-bar', authenticateToken, paymentController.verifyRazorpayBarPayment);
 
 // 3. Gear Shop & Inventory POS Routes (Bar/Shop Staff, Shop Staff, Front Desk & Owner)
 app.get('/api/shop/products', authenticateToken, shopController.getProducts);
+app.get('/api/shop/inventory', authenticateToken, shopController.getProducts);
+app.get('/api/shop/inventory/history', authenticateToken, shopController.getInventoryHistory);
 app.post('/api/shop/checkout', authenticateToken, shopController.checkout);
 app.post('/api/shop/products', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.createProduct);
 app.put('/api/shop/products/:id', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.updateProduct);
 app.delete('/api/shop/products/:id', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.deleteProduct);
 app.post('/api/shop/products/:id/restock', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.restockProduct);
+app.post('/api/shop/products/:id/add-stock', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.addStockToProduct);
+app.get('/api/shop/inventory-requests', authenticateToken, shopController.getInventoryRequests);
+app.post('/api/shop/inventory-requests', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.createInventoryRequest);
+app.put('/api/shop/inventory-requests/:id/approve', authenticateToken, authorizeRoles('OWNER'), shopController.approveInventoryRequest);
+app.put('/api/shop/inventory-requests/:id/reject', authenticateToken, authorizeRoles('OWNER'), shopController.rejectInventoryRequest);
+app.put('/api/shop/inventory-requests/:id/ordered', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.orderedInventoryRequest);
+app.put('/api/shop/inventory-requests/:id/receive', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.receiveInventoryRequest);
+app.get('/api/shop/purchase-requests', authenticateToken, shopController.getPurchaseRequests);
+app.post('/api/shop/purchase-requests', authenticateToken, authorizeRoles('BAR_SHOP_STAFF', 'SHOP_STAFF', 'SHOP', 'BAR', 'OWNER'), shopController.createPurchaseRequest);
+app.put('/api/shop/purchase-requests/:id/review', authenticateToken, authorizeRoles('OWNER'), shopController.reviewPurchaseRequest);
+
 
 // 4. Bar & Cafeteria POS Routes (Bar Staff, Bar/Shop Staff, Front Desk & Owner)
 app.get('/api/bar/menu', authenticateToken, barController.getBarItems);
@@ -105,6 +139,7 @@ app.delete('/api/bar/expenses/:id', authenticateToken, authorizeRoles('BAR_STAFF
 
 // 5. CRM Leads & Quote Engine Routes (Front Desk & Owner)
 app.get('/api/crm/leads', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), crmController.getLeads);
+app.post('/api/crm/leads', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), crmController.createLead);
 app.put('/api/crm/leads/:id', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), crmController.updateLeadStatus);
 app.post('/api/crm/quotes', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), crmController.generateQuote);
 
@@ -120,8 +155,8 @@ app.put('/api/invoices/:id/pay', authenticateToken, authorizeRoles('OWNER'), inv
 app.put('/api/invoices/:id/overdue', authenticateToken, authorizeRoles('OWNER'), invoiceController.markInvoiceOverdue);
 app.delete('/api/invoices/:id', authenticateToken, authorizeRoles('OWNER'), invoiceController.deleteInvoice);
 
-// 8. Staff Shifts & Leave Management Routes (Owner ONLY)
-app.get('/api/shifts', authenticateToken, authorizeRoles('OWNER'), shiftController.getShifts);
+// 8. Staff Shifts & Leave Management Routes
+app.get('/api/shifts', authenticateToken, authorizeRoles('FRONT_DESK_STAFF', 'FRONT_DESK', 'OWNER'), shiftController.getShifts);
 app.post('/api/shifts', authenticateToken, authorizeRoles('OWNER'), shiftController.createShift);
 app.put('/api/shifts/:id', authenticateToken, authorizeRoles('OWNER'), shiftController.updateShift);
 app.delete('/api/shifts/:id', authenticateToken, authorizeRoles('OWNER'), shiftController.deleteShift);

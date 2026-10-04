@@ -104,8 +104,8 @@ export default function LoginPage({ role: initialRole, title: customTitle, subti
       case 'SHOP_STAFF':
       case 'SHOP': return '/shop';
       case 'BAR_SHOP_STAFF': return '/bar-shop';
-      case 'MEMBER': return '/member';
-      default: return '/member';
+      case 'MEMBER': return '/bar-cafe';
+      default: return '/bar-cafe';
     }
   };
 

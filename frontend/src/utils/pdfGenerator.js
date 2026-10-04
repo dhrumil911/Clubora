@@ -1,9 +1,9 @@
 import { jsPDF } from 'jspdf';
 
 /**
- * Format a number as currency $XX.XX
+ * Format a number as currency Rs. XX.XX
  */
-const fmt = (num) => `$${Number(num || 0).toFixed(2)}`;
+const fmt = (num) => `Rs. ${Number(num || 0).toFixed(2)}`;
 
 /**
  * Common Clubora header drawer
@@ -149,7 +149,7 @@ export function downloadInvoicePDF(invoice) {
   doc.text('DESCRIPTION & SERVICE DETAILS', 20, y + 6);
   doc.text('TYPE', 115, y + 6);
   doc.text('QTY', 145, y + 6, { align: 'center' });
-  doc.text('AMOUNT ($)', 188, y + 6, { align: 'right' });
+  doc.text('AMOUNT (INR)', 188, y + 6, { align: 'right' });
 
   y += 9;
 
@@ -191,7 +191,7 @@ export function downloadInvoicePDF(invoice) {
   doc.text(fmt(amount), 188, subY + 9, { align: 'right' });
 
   doc.text('Applicable Taxes (0% Inc.):', 116, subY + 17);
-  doc.text('$0.00', 188, subY + 17, { align: 'right' });
+  doc.text('Rs. 0.00', 188, subY + 17, { align: 'right' });
 
   doc.setDrawColor(203, 213, 225);
   doc.line(116, subY + 22, 188, subY + 22);
@@ -298,7 +298,7 @@ export function downloadFinanceReportPDF(data, period = 'all') {
   doc.text('STREAM / CHANNEL', 20, y + 5.5);
   doc.text('DESCRIPTION', 75, y + 5.5);
   doc.text('SHARE %', 140, y + 5.5, { align: 'center' });
-  doc.text('REVENUE ($)', 188, y + 5.5, { align: 'right' });
+  doc.text('REVENUE (INR)', 188, y + 5.5, { align: 'right' });
 
   y += 8;
 
@@ -389,7 +389,7 @@ export function downloadFinanceReportPDF(data, period = 'all') {
   doc.text('CLIENT NAME', 60, y + 5.5);
   doc.text('DUE DATE', 120, y + 5.5);
   doc.text('STATUS', 150, y + 5.5);
-  doc.text('AMOUNT ($)', 188, y + 5.5, { align: 'right' });
+  doc.text('AMOUNT (INR)', 188, y + 5.5, { align: 'right' });
 
   y += 8;
 
@@ -617,7 +617,7 @@ export function downloadReceiptPDF(receipt) {
     doc.text(`-${fmt(discAmt)}`, 134, y + 12, { align: 'right' });
   } else {
     doc.text('Member Discount (0%):', 72, y + 12);
-    doc.text('$0.00', 134, y + 12, { align: 'right' });
+    doc.text('Rs. 0.00', 134, y + 12, { align: 'right' });
   }
 
   doc.setDrawColor(203, 213, 225);

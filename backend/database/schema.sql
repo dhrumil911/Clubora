@@ -73,6 +73,22 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS inventory_requests (
+  id VARCHAR(36) PRIMARY KEY,
+  product_id VARCHAR(36) REFERENCES products(id) ON DELETE SET NULL,
+  item_name VARCHAR(255) NOT NULL,
+  category VARCHAR(50) NOT NULL DEFAULT 'ACCESSORIES',
+  requested_quantity INTEGER NOT NULL CHECK (requested_quantity > 0),
+  received_quantity INTEGER NOT NULL DEFAULT 0 CHECK (received_quantity >= 0),
+  requested_by VARCHAR(255) NOT NULL,
+  requested_by_role VARCHAR(50) DEFAULT 'BAR_SHOP_STAFF',
+  status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+  notes TEXT,
+  approved_by VARCHAR(255),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS inventory_transactions (
   id VARCHAR(36) PRIMARY KEY,
   product_id VARCHAR(36) NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -203,3 +219,24 @@ CREATE INDEX IF NOT EXISTS idx_bar_tabs_status ON bar_tabs(status);
 CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status);
 CREATE INDEX IF NOT EXISTS idx_shifts_date ON shifts(date);
 CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(status);
+
+CREATE TABLE IF NOT EXISTS payments (
+  id VARCHAR(36) PRIMARY KEY,
+  booking_id VARCHAR(36) REFERENCES bookings(id) ON DELETE CASCADE,
+  amount NUMERIC(10,2) NOT NULL,
+  currency VARCHAR(10) DEFAULT 'INR',
+  method VARCHAR(50) NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+  razorpay_order_id VARCHAR(255),
+  razorpay_payment_id VARCHAR(255),
+  razorpay_signature VARCHAR(255),
+  error_code VARCHAR(255),
+  error_description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_payments_booking_id ON payments(booking_id);
+CREATE INDEX IF NOT EXISTS idx_payments_razorpay_order_id ON payments(razorpay_order_id);
+CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+

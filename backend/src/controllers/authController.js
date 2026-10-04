@@ -75,7 +75,10 @@ export async function login(req, res) {
  */
 export async function register(req, res) {
   try {
-    const { name, email, phone, password, confirmPassword } = req.body;
+    const { 
+      name, email, phone, password, confirmPassword, 
+      tierName = 'Gold', tierId, durationMonths = 12 
+    } = req.body;
 
     // 1. Validation
     if (!name || !email || !phone || !password || !confirmPassword) {
@@ -115,21 +118,38 @@ export async function register(req, res) {
       [userId, cleanEmail, passwordHash, name.trim()]
     );
 
-    // 4. Create corresponding Member profile so member features work
+    // 4. Create corresponding Member profile with selected Tier & Duration
     const countRes = await query('SELECT COUNT(*) FROM members');
     const memberCount = parseInt(countRes[0].count, 10) + 1;
-    const memberCode = `MEM-WALK-${String(memberCount).padStart(3, '0')}`;
-    const memberId = `mem-${Date.now()}`;
-    const expiresAt = new Date();
-    expiresAt.setFullYear(expiresAt.getFullYear() + 1);
 
-    // Check default tier (Walk-in or Silver)
-    const tierRes = await query(`SELECT id FROM membership_tiers WHERE name = 'Walk-in' OR name = 'Silver' LIMIT 1`);
-    const defaultTierId = tierRes.length > 0 ? tierRes[0].id : 'tier-walkin';
+    // Resolve selected tier (Gold, Silver, Junior)
+    let selectedTier = null;
+    if (tierId) {
+      const tRes = await query(`SELECT * FROM membership_tiers WHERE id = $1`, [tierId]);
+      if (tRes.length > 0) selectedTier = tRes[0];
+    }
+    if (!selectedTier && tierName) {
+      const tRes = await query(`SELECT * FROM membership_tiers WHERE LOWER(name) = LOWER($1)`, [tierName]);
+      if (tRes.length > 0) selectedTier = tRes[0];
+    }
+    if (!selectedTier) {
+      const tRes = await query(`SELECT * FROM membership_tiers WHERE name = 'Gold' OR name = 'Silver' LIMIT 1`);
+      if (tRes.length > 0) selectedTier = tRes[0];
+    }
+
+    const tierCode = selectedTier ? selectedTier.name.substring(0, 4).toUpperCase() : 'GOLD';
+    const memberCode = `MEM-${tierCode}-${String(memberCount).padStart(3, '0')}`;
+    const memberId = `mem-${Date.now()}`;
+    
+    // Calculate expiration based on 3, 6, or 12 months
+    const joinedAt = new Date();
+    const expiresAt = new Date();
+    const months = parseInt(durationMonths, 10) || 12;
+    expiresAt.setMonth(joinedAt.getMonth() + months);
 
     await query(
-      `INSERT INTO members (id, member_code, name, email, phone, tier_id, expires_at, status) VALUES ($1, $2, $3, $4, $5, $6, $7, 'ACTIVE')`,
-      [memberId, memberCode, name.trim(), cleanEmail, phone.trim(), defaultTierId, expiresAt.toISOString()]
+      `INSERT INTO members (id, member_code, name, email, phone, tier_id, joined_at, expires_at, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'ACTIVE')`,
+      [memberId, memberCode, name.trim(), cleanEmail, phone.trim(), selectedTier?.id || 'tier-gold', joinedAt.toISOString(), expiresAt.toISOString()]
     );
 
     // 5. Issue JWT Token

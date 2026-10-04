@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { downloadInvoicePDF } from '../utils/pdfGenerator';
 
-export default function InvoicesPage() {
+export default function InvoicesPage({ isEmbedded = false }) {
   const [invoices, setInvoices] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +44,7 @@ export default function InvoicesPage() {
       setCreateForm({ clientName: '', clientEmail: '', type: 'CORPORATE', amount: '', dueDate: '', notes: '' });
       fetchData();
     } catch (err) {
-      alert('Failed to create invoice.');
+      alert(err.response?.data?.error || err.message || 'Failed to create invoice.');
     }
   };
 
@@ -89,18 +89,18 @@ export default function InvoicesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 text-white">
+    <div className={isEmbedded ? 'w-full min-w-0 text-white' : 'max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-white'}>
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
+      <div className={isEmbedded ? 'owner-tab-actions flex justify-end' : 'flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8'}>
+        {!isEmbedded && <div>
           <h1 className="text-3xl font-black text-white flex items-center gap-3 tracking-tight">
             <FileText className="w-8 h-8 text-lime-400" /> Invoices & Billing
           </h1>
           <p className="text-zinc-400 text-sm mt-1 font-medium">
             Generate, track, and manage client invoices across memberships and corporate accounts.
           </p>
-        </div>
+        </div>}
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
@@ -128,7 +128,7 @@ export default function InvoicesPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="bg-zinc-900 text-white p-5 rounded-3xl border border-zinc-800 shadow-2xl">
             <div className="text-[10px] font-bold text-lime-400 uppercase tracking-wider">Total Invoiced</div>
-            <div className="text-2xl font-black text-white mt-1">${summary.total.amount.toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-1">₹{summary.total.amount.toFixed(2)}</div>
             <div className="text-xs text-zinc-400 mt-1">{summary.total.count} invoices</div>
           </div>
           <div className="bg-zinc-900 p-5 rounded-3xl border border-zinc-800 shadow-2xl">
@@ -136,7 +136,7 @@ export default function InvoicesPage() {
               <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Pending</span>
               <Clock className="w-4 h-4 text-amber-400" />
             </div>
-            <div className="text-2xl font-black text-white mt-1">${summary.pending.amount.toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-1">₹{summary.pending.amount.toFixed(2)}</div>
             <div className="text-xs text-zinc-400 mt-1">{summary.pending.count} awaiting payment</div>
           </div>
           <div className="bg-zinc-900 p-5 rounded-3xl border border-zinc-800 shadow-2xl">
@@ -144,7 +144,7 @@ export default function InvoicesPage() {
               <span className="text-[10px] font-bold text-lime-400 uppercase tracking-wider">Paid</span>
               <CheckCircle2 className="w-4 h-4 text-lime-400" />
             </div>
-            <div className="text-2xl font-black text-white mt-1">${summary.paid.amount.toFixed(2)}</div>
+            <div className="text-2xl font-black text-white mt-1">₹{summary.paid.amount.toFixed(2)}</div>
             <div className="text-xs text-zinc-400 mt-1">{summary.paid.count} collected</div>
           </div>
           <div className="bg-zinc-900 p-5 rounded-3xl border border-zinc-800 shadow-2xl">
@@ -152,7 +152,7 @@ export default function InvoicesPage() {
               <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Overdue</span>
               <AlertTriangle className="w-4 h-4 text-rose-400" />
             </div>
-            <div className="text-2xl font-black text-rose-400 mt-1">${summary.overdue.amount.toFixed(2)}</div>
+            <div className="text-2xl font-black text-rose-400 mt-1">₹{summary.overdue.amount.toFixed(2)}</div>
             <div className="text-xs text-zinc-400 mt-1">{summary.overdue.count} past due</div>
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function InvoicesPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right mr-4">
-                    <div className="text-2xl font-black text-lime-400">${inv.amount.toFixed(2)}</div>
+                    <div className="text-2xl font-black text-lime-400">₹{inv.amount.toFixed(2)}</div>
                     {inv.paidAt && <div className="text-[10px] text-emerald-400 font-semibold">Paid {new Date(inv.paidAt).toLocaleDateString()}</div>}
                   </div>
                   <button
@@ -283,10 +283,10 @@ export default function InvoicesPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Amount ($)</label>
+                  <label className="block text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Amount (₹)</label>
                   <input type="number" step="0.01" required value={createForm.amount}
                     onChange={(e) => setCreateForm({ ...createForm, amount: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-xs focus:ring-1 focus:ring-lime-400 focus:border-lime-400 font-black text-lime-400 text-sm"
+                    className="w-full px-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl focus:ring-1 focus:ring-lime-400 focus:border-lime-400 font-black text-lime-400 text-sm"
                     placeholder="0.00" />
                 </div>
                 <div>
